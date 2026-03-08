@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gym Frontend (Auth)
 
-## Getting Started
+Frontend auth project built with Next.js (App Router), TypeScript, Tailwind CSS, Shadcn-style UI components, React Query, Axios, and Zustand.
 
-First, run the development server:
+## Implemented Pages
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- `/auth/login` - login form (`email`, `password`)
+- `/auth/register` - register form (`email`, `password`, `role` dropdown: `ADMIN`/`TRAINER`)
+- `/auth/forgot-password` - forgot password form (`email`)
+
+## Implemented Structure
+
+```text
+src/
+├─ app/auth/
+│  ├─ login/page.tsx
+│  ├─ register/page.tsx
+│  ├─ forgot-password/page.tsx
+│  └─ components/AuthForm.tsx
+├─ components/ui/
+│  ├─ InputField.tsx
+│  └─ Button.tsx
+├─ services/api.ts
+├─ services/auth.ts
+├─ hooks/useAuth.ts
+└─ store/useStore.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Integration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `loginUser(email, password)` -> `POST /auth/login`
+- `registerUser(email, password, role)` -> `POST /auth/register`
+- `forgotPassword(email)` -> `POST /auth/forgot-password`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set backend base URL in `.env.local`:
 
-## Learn More
+```dotenv
+NEXT_PUBLIC_API_URL=http://localhost:3002
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open `http://localhost:3000`.
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Forms are reusable through `AuthForm`.
+- Toast feedback is provided by `react-hot-toast`.
+- Auth tokens are persisted in Zustand store.
