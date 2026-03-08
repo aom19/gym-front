@@ -1,10 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 
@@ -26,6 +27,11 @@ const LOGIN_ENDPOINT = process.env.NEXT_PUBLIC_LOGIN_ENDPOINT ?? "http://localho
 
 export function LoginForm() {
   const router = useRouter();
+  const params = useParams();
+  const lang = (params?.lang as string) || "ro";
+  const t = useTranslations("auth");
+  const tErrors = useTranslations("errors");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -50,9 +56,10 @@ export function LoginForm() {
       const payload = (await response.json()) as LoginResponse | { message?: string };
 
       if (!response.ok) {
-        const message = typeof payload === "object" && payload && "message" in payload
-          ? payload.message || "Login failed"
-          : "Login failed";
+        const message =
+          typeof payload === "object" && payload && "message" in payload
+            ? payload.message || tErrors("loginFailed")
+            : tErrors("loginFailed");
         setError(message);
         toast.error(message);
         return;
@@ -70,15 +77,15 @@ export function LoginForm() {
       toast.success("Login successful");
 
       if (data.user?.role === "ADMIN") {
-        router.replace("/admin/dashboard");
+        router.replace(`/${lang}/admin/dashboard`);
         return;
       }
 
-      setError("Authenticated, but this account does not have ADMIN access.");
-      toast.error("Only ADMIN can access this dashboard");
+      setError(tErrors("adminOnly"));
+      toast.error(tErrors("adminOnly"));
     } catch {
-      setError("Unexpected error. Please try again.");
-      toast.error("Unexpected error. Please try again.");
+      setError(tErrors("generic"));
+      toast.error(tErrors("generic"));
     } finally {
       setIsLoading(false);
     }
@@ -87,8 +94,8 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-5">
       <div className="grid gap-2">
-        <label htmlFor="email" className="text-sm font-medium text-slate-700">
-          Email
+        <label htmlFor="email" className="text-sm font-medium text-foreground">
+          {t("email")}
         </label>
         <Input
           id="email"
@@ -103,8 +110,8 @@ export function LoginForm() {
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="password" className="text-sm font-medium text-slate-700">
-          Password
+        <label htmlFor="password" className="text-sm font-medium text-foreground">
+          {t("password")}
         </label>
         <div className="relative">
           <Input
@@ -121,7 +128,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -129,15 +136,19 @@ export function LoginForm() {
         </div>
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button type="submit" disabled={isLoading} className="h-11">
-        {isLoading ? "Signing in..." : "Sign in"}
+        {isLoading ? "Signing in..." : t("loginButton")}
       </Button>
 
-      <Link href="/forgot-password" className="text-sm font-medium text-slate-700 underline-offset-4 hover:underline">
-        Forgot your password?
+      <Link
+        href={`/${lang}/forgot-password`}
+        className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
+      >
+        {t("forgotPassword")}
       </Link>
     </form>
   );
 }
+

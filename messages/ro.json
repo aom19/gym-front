@@ -1,0 +1,51 @@
+{
+    "nav": {
+        "dashboard": "Panou de control",
+        "settings": "Setări",
+        "logout": "Deconectare",
+        "login": "Autentificare"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Parolă",
+        "loginTitle": "Bine ai venit",
+        "loginSubtitle": "Autentifică-te în contul tău",
+        "loginButton": "Autentificare",
+        "forgotPassword": "Ai uitat parola?",
+        "resetPassword": "Resetare parolă",
+        "forgotTitle": "Resetare parolă",
+        "forgotSubtitle": "Introdu adresa de email pentru a primi link-ul de resetare",
+        "forgotButton": "Trimite link-ul de resetare",
+        "backToLogin": "Înapoi la autentificare",
+        "resetTitle": "Parolă nouă",
+        "resetSubtitle": "Introdu noua parolă",
+        "newPassword": "Parolă nouă",
+        "confirmPassword": "Confirmă parola",
+        "resetButton": "Resetează parola",
+        "resetToken": "Token de resetare",
+        "resetTokenPlaceholder": "Introduceți token-ul din email",
+        "emailSent": "Email trimis! Verifică căsuța poștală."
+    },
+    "preferences": {
+        "title": "Preferințe",
+        "subtitle": "Personalizează-ți experiența",
+        "language": "Limbă",
+        "theme": "Temă",
+        "saveButton": "Salvează preferințele",
+        "savedMessage": "Preferințele au fost salvate",
+        "light": "Luminos",
+        "dark": "Întunecat",
+        "forest": "Pădure"
+    },
+    "dashboard": {
+        "title": "Panou de control Admin",
+        "email": "Email",
+        "role": "Rol",
+        "location": "Locație"
+    },
+    "errors": {
+        "generic": "A apărut o eroare. Încearcă din nou.",
+        "loginFailed": "Autentificare eșuată",
+        "adminOnly": "Doar conturile ADMIN pot accesa acest panou"
+    }
+}

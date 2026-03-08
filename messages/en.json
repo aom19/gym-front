@@ -1,0 +1,51 @@
+{
+    "nav": {
+        "dashboard": "Dashboard",
+        "settings": "Settings",
+        "logout": "Logout",
+        "login": "Login"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "loginTitle": "Welcome back",
+        "loginSubtitle": "Sign in to your account",
+        "loginButton": "Sign in",
+        "forgotPassword": "Forgot your password?",
+        "resetPassword": "Reset password",
+        "forgotTitle": "Reset password",
+        "forgotSubtitle": "Enter your email to receive a reset link",
+        "forgotButton": "Send reset link",
+        "backToLogin": "Back to login",
+        "resetTitle": "New password",
+        "resetSubtitle": "Enter your new password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password",
+        "resetButton": "Reset password",
+        "resetToken": "Reset token",
+        "resetTokenPlaceholder": "Enter the token from your email",
+        "emailSent": "Email sent! Check your inbox."
+    },
+    "preferences": {
+        "title": "Preferences",
+        "subtitle": "Customise your experience",
+        "language": "Language",
+        "theme": "Theme",
+        "saveButton": "Save preferences",
+        "savedMessage": "Preferences saved",
+        "light": "Light",
+        "dark": "Dark",
+        "forest": "Forest"
+    },
+    "dashboard": {
+        "title": "Admin Dashboard",
+        "email": "Email",
+        "role": "Role",
+        "location": "Location"
+    },
+    "errors": {
+        "generic": "An error occurred. Please try again.",
+        "loginFailed": "Login failed",
+        "adminOnly": "Only ADMIN accounts can access this dashboard"
+    }
+}

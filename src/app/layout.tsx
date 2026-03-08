@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Manrope } from "next/font/google";
-import { Providers } from "@/app/providers";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -24,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning>
       <body className={`${manrope.variable} ${jetBrainsMono.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

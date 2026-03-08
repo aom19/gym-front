@@ -1,0 +1,51 @@
+{
+    "nav": {
+        "dashboard": "Панель управления",
+        "settings": "Настройки",
+        "logout": "Выход",
+        "login": "Войти"
+    },
+    "auth": {
+        "email": "Email",
+        "password": "Пароль",
+        "loginTitle": "Добро пожаловать",
+        "loginSubtitle": "Войдите в свой аккаунт",
+        "loginButton": "Войти",
+        "forgotPassword": "Забыли пароль?",
+        "resetPassword": "Сброс пароля",
+        "forgotTitle": "Сброс пароля",
+        "forgotSubtitle": "Введите email для получения ссылки сброса",
+        "forgotButton": "Отправить ссылку",
+        "backToLogin": "Назад к входу",
+        "resetTitle": "Новый пароль",
+        "resetSubtitle": "Введите новый пароль",
+        "newPassword": "Новый пароль",
+        "confirmPassword": "Подтвердите пароль",
+        "resetButton": "Сбросить пароль",
+        "resetToken": "Токен сброса",
+        "resetTokenPlaceholder": "Введите токен из email",
+        "emailSent": "Email отправлен! Проверьте почту."
+    },
+    "preferences": {
+        "title": "Настройки",
+        "subtitle": "Настройте свой опыт",
+        "language": "Язык",
+        "theme": "Тема",
+        "saveButton": "Сохранить настройки",
+        "savedMessage": "Настройки сохранены",
+        "light": "Светлая",
+        "dark": "Тёмная",
+        "forest": "Лесная"
+    },
+    "dashboard": {
+        "title": "Панель администратора",
+        "email": "Email",
+        "role": "Роль",
+        "location": "Локация"
+    },
+    "errors": {
+        "generic": "Произошла ошибка. Попробуйте снова.",
+        "loginFailed": "Ошибка входа",
+        "adminOnly": "Только аккаунты ADMIN могут получить доступ к этой панели"
+    }
+}
