@@ -3,7 +3,13 @@
         "dashboard": "Dashboard",
         "settings": "Settings",
         "logout": "Logout",
-        "login": "Login"
+        "login": "Login",
+        "home": "Home",
+        "memberships": "Memberships",
+        "classes": "Classes",
+        "locations": "Locations",
+        "about": "About",
+        "contact": "Contact"
     },
     "auth": {
         "email": "Email",
@@ -41,7 +47,118 @@
         "title": "Admin Dashboard",
         "email": "Email",
         "role": "Role",
-        "location": "Location"
+        "location": "Location",
+        "totalMembers": "Total Members",
+        "activeSubscriptions": "Active Subscriptions",
+        "todayCheckins": "Today Check-ins",
+        "monthlyRevenue": "Monthly Revenue",
+        "recentActivity": "Recent Activity",
+        "overview": "Overview"
+    },
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "members": "Members",
+        "subscriptions": "Subscriptions",
+        "payments": "Payments",
+        "checkins": "Check-ins",
+        "workouts": "Workouts",
+        "locations": "Locations",
+        "reports": "Reports",
+        "settings": "Settings"
+    },
+    "members": {
+        "title": "Members",
+        "subtitle": "Manage gym members",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "membership": "Membership",
+        "status": "Status",
+        "actions": "Actions",
+        "active": "Active",
+        "inactive": "Inactive",
+        "addMember": "Add Member",
+        "noMembers": "No members found"
+    },
+    "subscriptions": {
+        "title": "Subscriptions",
+        "subtitle": "Membership plans and subscriptions",
+        "plan": "Plan",
+        "duration": "Duration",
+        "price": "Price",
+        "members": "Members",
+        "days": "days"
+    },
+    "checkins": {
+        "title": "Check-ins",
+        "subtitle": "Recent gym attendance",
+        "member": "Member",
+        "time": "Time",
+        "location": "Location",
+        "noCheckins": "No check-ins today"
+    },
+    "home": {
+        "heroTitle": "The smarter way to manage your gym",
+        "heroSubtitle": "All-in-one platform for members, schedules, payments and analytics.",
+        "heroCta": "Get started free",
+        "heroSecondary": "See memberships",
+        "featuresTitle": "Everything you need",
+        "feature1Title": "Member Management",
+        "feature1Desc": "Track and manage all your gym members in one place.",
+        "feature2Title": "Scheduling",
+        "feature2Desc": "Classes, trainers and facilities — all organised.",
+        "feature3Title": "Payments",
+        "feature3Desc": "Automated billing, invoices and revenue analytics.",
+        "feature4Title": "Analytics",
+        "feature4Desc": "Real-time insights into your gym performance."
+    },
+    "about": {
+        "desc1": "GymPro is a premium fitness management platform designed to help gym owners, coaches, and members thrive. Our all-in-one solution eliminates the complexity of running a modern gym — from scheduling and payments to analytics and member engagement.",
+        "desc2": "Founded in 2024, we work with gyms across Eastern Europe to digitise their operations, reduce overhead, and deliver a better experience to their members.",
+        "stat1Value": "1,200+",
+        "stat1Label": "Active members",
+        "stat2Value": "3",
+        "stat2Label": "Locations",
+        "stat3Value": "98%",
+        "stat3Label": "Satisfaction rate"
+    },
+    "classes": {
+        "subtitle": "Join our expert-led group classes and achieve your fitness goals.",
+        "trainerLabel": "Trainer",
+        "spotsLabel": "spots",
+        "yogaSchedule": "Mon / Wed / Fri — 07:00",
+        "hiitSchedule": "Tue / Thu — 18:30",
+        "cyclingSchedule": "Mon / Wed / Sat — 09:00",
+        "boxingSchedule": "Tue / Thu / Sat — 19:00",
+        "pilatesSchedule": "Fri — 10:00",
+        "zumbaSchedule": "Wed / Fri — 17:30"
+    },
+    "locations": {
+        "subtitle": "Find your nearest GymPro location.",
+        "loc1Hours": "Mon–Fri 06:00–22:00 / Sat–Sun 08:00–20:00",
+        "loc2Hours": "Mon–Fri 07:00–21:00 / Sat–Sun 09:00–18:00",
+        "loc3Hours": "Mon–Fri 06:30–22:00 / Sat 08:00–19:00"
+    },
+    "contact": {
+        "subtitle": "We'd love to hear from you.",
+        "emailLabel": "Email",
+        "phoneLabel": "Phone",
+        "hqLabel": "Headquarters",
+        "nameField": "Name",
+        "emailField": "Email",
+        "messageField": "Message",
+        "namePlaceholder": "Your name",
+        "messagePlaceholder": "How can we help?",
+        "sendButton": "Send message"
+    },
+    "memberships": {
+        "popular": "Popular",
+        "getStarted": "Get started",
+        "featureAccess": "Unlimited access",
+        "featureLocker": "Locker use",
+        "feature2Classes": "2 group classes/week",
+        "featureUnlimitedClasses": "Unlimited classes",
+        "featureTrainer": "Personal trainer session"
     },
     "errors": {
         "generic": "An error occurred. Please try again.",

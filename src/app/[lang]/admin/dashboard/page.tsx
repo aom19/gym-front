@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getUser } from "@/utils/auth";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import Link from "next/link";
+import { Users, CreditCard, CheckSquare, DollarSign } from "lucide-react";
 
 export default async function AdminDashboardPage({
   params,
@@ -18,56 +16,73 @@ export default async function AdminDashboardPage({
   }
 
   const t = await getTranslations("dashboard");
-  const tNav = await getTranslations("nav");
+
+  const stats = [
+    { labelKey: "totalMembers", value: "1,248", icon: Users, delta: "+12 this month" },
+    { labelKey: "activeSubscriptions", value: "984", icon: CreditCard, delta: "+8 this week" },
+    { labelKey: "todayCheckins", value: "73", icon: CheckSquare, delta: "of 89 expected" },
+    { labelKey: "monthlyRevenue", value: "€48,320", icon: DollarSign, delta: "+6.3% vs last month" },
+  ] as const;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-12 sm:px-8">
-      <section className="mx-auto max-w-3xl space-y-6">
-        {/* Top bar */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold text-foreground">{t("title")}</h1>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <ThemeSwitcher />
-            <form action="/auth/logout" method="POST">
-              <button
-                type="submit"
-                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground transition hover:bg-accent hover:text-accent-foreground"
-              >
-                {tNav("logout")}
-              </button>
-            </form>
-          </div>
-        </div>
+    <div className="space-y-8">
+      {/* Page title */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("overview")}</p>
+      </div>
 
-        {/* User card */}
-        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-          <div className="grid gap-4 rounded-xl bg-muted p-5 text-sm sm:text-base">
-            <p>
-              <span className="font-semibold text-muted-foreground">{t("email")}:</span>{" "}
-              <span className="text-foreground">{user.email}</span>
-            </p>
-            <p>
-              <span className="font-semibold text-muted-foreground">{t("role")}:</span>{" "}
-              <span className="text-foreground">{user.role}</span>
-            </p>
-            <p>
-              <span className="font-semibold text-muted-foreground">{t("location")}:</span>{" "}
-              <span className="text-foreground">{user.location?.name ?? "N/A"}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Quick links */}
-        <div className="flex gap-3">
-          <Link
-            href={`/${lang}/settings/preferences`}
-            className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
+      {/* Stat cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map(({ labelKey, value, icon: Icon, delta }) => (
+          <div
+            key={labelKey}
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 ring-1 ring-foreground/10"
           >
-            Preferences
-          </Link>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t(labelKey)}
+              </p>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="size-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-xs text-muted-foreground">{delta}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent activity placeholder */}
+      <div className="rounded-xl border border-border bg-card p-6 ring-1 ring-foreground/10">
+        <h2 className="mb-4 text-sm font-semibold text-foreground">{t("recentActivity")}</h2>
+        <div className="flex flex-col gap-3">
+          {[
+            { name: "Ion Popa", action: "Checked in at GymPro Central", time: "2 min ago" },
+            { name: "Maria Ionescu", action: "Started Premium subscription", time: "15 min ago" },
+            { name: "Alexandru Rusu", action: "Checked in at GymPro Botanica", time: "32 min ago" },
+            { name: "Elena Cojocaru", action: "Renewed Basic subscription", time: "1 hr ago" },
+            { name: "Andrei Mihail", action: "Checked in at GymPro Central", time: "1 hr ago" },
+          ].map((item) => (
+            <div
+              key={item.name}
+              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-muted"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                  {item.name[0]}
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">{item.action}</p>
+                </div>
+              </div>
+              <span className="text-xs text-muted-foreground">{item.time}</span>
+            </div>
+          ))}
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
+

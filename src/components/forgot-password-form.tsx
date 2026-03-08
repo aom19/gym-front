@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface ForgotPasswordResponse {

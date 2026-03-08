@@ -3,7 +3,13 @@
         "dashboard": "Panou de control",
         "settings": "Setări",
         "logout": "Deconectare",
-        "login": "Autentificare"
+        "login": "Autentificare",
+        "home": "Acasă",
+        "memberships": "Abonamente",
+        "classes": "Clase",
+        "locations": "Locații",
+        "about": "Despre",
+        "contact": "Contact"
     },
     "auth": {
         "email": "Email",
@@ -41,7 +47,118 @@
         "title": "Panou de control Admin",
         "email": "Email",
         "role": "Rol",
-        "location": "Locație"
+        "location": "Locație",
+        "totalMembers": "Total Membri",
+        "activeSubscriptions": "Abonamente Active",
+        "todayCheckins": "Check-in-uri Azi",
+        "monthlyRevenue": "Venit Lunar",
+        "recentActivity": "Activitate Recentă",
+        "overview": "Prezentare generală"
+    },
+    "sidebar": {
+        "dashboard": "Panou",
+        "members": "Membri",
+        "subscriptions": "Abonamente",
+        "payments": "Plăți",
+        "checkins": "Check-in-uri",
+        "workouts": "Antrenamente",
+        "locations": "Locații",
+        "reports": "Rapoarte",
+        "settings": "Setări"
+    },
+    "members": {
+        "title": "Membri",
+        "subtitle": "Gestionează membrii sălii",
+        "name": "Nume",
+        "email": "Email",
+        "phone": "Telefon",
+        "membership": "Abonament",
+        "status": "Status",
+        "actions": "Acțiuni",
+        "active": "Activ",
+        "inactive": "Inactiv",
+        "addMember": "Adaugă Membru",
+        "noMembers": "Nu s-au găsit membri"
+    },
+    "subscriptions": {
+        "title": "Abonamente",
+        "subtitle": "Planuri de abonament",
+        "plan": "Plan",
+        "duration": "Durată",
+        "price": "Preț",
+        "members": "Membri",
+        "days": "zile"
+    },
+    "checkins": {
+        "title": "Check-in-uri",
+        "subtitle": "Prezența recentă la sală",
+        "member": "Membru",
+        "time": "Ora",
+        "location": "Locație",
+        "noCheckins": "Niciun check-in azi"
+    },
+    "home": {
+        "heroTitle": "Modalitatea mai inteligentă de a-ți gestiona sala",
+        "heroSubtitle": "Platformă all-in-one pentru membri, programe, plăți și analize.",
+        "heroCta": "Începe gratuit",
+        "heroSecondary": "Vezi abonamentele",
+        "featuresTitle": "Tot ce ai nevoie",
+        "feature1Title": "Gestionare Membri",
+        "feature1Desc": "Urmărește și gestionează toți membrii sălii într-un singur loc.",
+        "feature2Title": "Programare",
+        "feature2Desc": "Clase, antrenori și facilități — totul organizat.",
+        "feature3Title": "Plăți",
+        "feature3Desc": "Facturare automată, facturi și analize de venituri.",
+        "feature4Title": "Analize",
+        "feature4Desc": "Informații în timp real despre performanța sălii tale."
+    },
+    "about": {
+        "desc1": "GymPro este o platformă premium de management al sălii de fitness, concepută pentru a ajuta proprietarii de săli, antrenorii și membrii să prospere. Soluția noastră all-in-one elimină complexitatea administrării unei săli moderne — de la programare și plăți la analize și implicarea membrilor.",
+        "desc2": "Fondată în 2024, colaborăm cu săli din Europa de Est pentru a le digitaliza operațiunile, a reduce costurile și a oferi o experiență mai bună membrilor lor.",
+        "stat1Value": "1.200+",
+        "stat1Label": "Membri activi",
+        "stat2Value": "3",
+        "stat2Label": "Locații",
+        "stat3Value": "98%",
+        "stat3Label": "Rata de satisfacție"
+    },
+    "classes": {
+        "subtitle": "Alătură-te claselor noastre de grup conduse de experți și atinge-ți obiectivele de fitness.",
+        "trainerLabel": "Antrenor",
+        "spotsLabel": "locuri",
+        "yogaSchedule": "Lun / Mie / Vin — 07:00",
+        "hiitSchedule": "Mar / Joi — 18:30",
+        "cyclingSchedule": "Lun / Mie / Sâm — 09:00",
+        "boxingSchedule": "Mar / Joi / Sâm — 19:00",
+        "pilatesSchedule": "Vin — 10:00",
+        "zumbaSchedule": "Mie / Vin — 17:30"
+    },
+    "locations": {
+        "subtitle": "Găsește cea mai apropiată locație GymPro.",
+        "loc1Hours": "Lun–Vin 06:00–22:00 / Sâm–Dum 08:00–20:00",
+        "loc2Hours": "Lun–Vin 07:00–21:00 / Sâm–Dum 09:00–18:00",
+        "loc3Hours": "Lun–Vin 06:30–22:00 / Sâm 08:00–19:00"
+    },
+    "contact": {
+        "subtitle": "Ne-ar face plăcere să auzim de la tine.",
+        "emailLabel": "Email",
+        "phoneLabel": "Telefon",
+        "hqLabel": "Sediu central",
+        "nameField": "Nume",
+        "emailField": "Email",
+        "messageField": "Mesaj",
+        "namePlaceholder": "Numele tău",
+        "messagePlaceholder": "Cum te putem ajuta?",
+        "sendButton": "Trimite mesajul"
+    },
+    "memberships": {
+        "popular": "Popular",
+        "getStarted": "Începe acum",
+        "featureAccess": "Acces nelimitat",
+        "featureLocker": "Utilizare vestiar",
+        "feature2Classes": "2 clase de grup/săptămână",
+        "featureUnlimitedClasses": "Clase nelimitate",
+        "featureTrainer": "Sesiune cu antrenor personal"
     },
     "errors": {
         "generic": "A apărut o eroare. Încearcă din nou.",
