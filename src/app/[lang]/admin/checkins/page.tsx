@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 const mockCheckins = [
   { id: 1, member: "Ion Popa", time: "09:14", location: "GymPro Central" },
@@ -16,7 +16,13 @@ for (const c of mockCheckins) {
   locationCounts[c.location] = (locationCounts[c.location] ?? 0) + 1;
 }
 
-export default async function CheckinsPage() {
+export default async function CheckinsPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const t = await getTranslations("checkins");
 
   return (

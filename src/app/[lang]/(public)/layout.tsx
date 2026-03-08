@@ -1,10 +1,15 @@
+import { setRequestLocale } from "next-intl/server";
 import { PublicNavbar } from "@/components/layout/public-navbar";
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <PublicNavbar />

@@ -1,7 +1,13 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Mail, Phone, MapPin } from "lucide-react";
 
-export default async function ContactPage() {
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const tNav = await getTranslations("nav");
   const t = await getTranslations("contact");
 

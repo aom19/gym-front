@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 type ScheduleKey = "yogaSchedule" | "hiitSchedule" | "cyclingSchedule" | "boxingSchedule" | "pilatesSchedule" | "zumbaSchedule";
 
@@ -11,7 +11,13 @@ const classes: { name: string; scheduleKey: ScheduleKey; trainer: string; spots:
   { name: "Zumba", scheduleKey: "zumbaSchedule", trainer: "Corina B.", spots: 20 },
 ];
 
-export default async function ClassesPage() {
+export default async function ClassesPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const tNav = await getTranslations("nav");
   const t = await getTranslations("classes");
 

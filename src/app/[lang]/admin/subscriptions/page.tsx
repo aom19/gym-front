@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 const plans = [
   { name: "Basic", duration: 30, price: "€29", activeMembers: 312 },
@@ -8,7 +8,13 @@ const plans = [
   { name: "Annual Premium", duration: 365, price: "€699", activeMembers: 42 },
 ];
 
-export default async function SubscriptionsPage() {
+export default async function SubscriptionsPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const t = await getTranslations("subscriptions");
 
   return (

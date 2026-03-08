@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
 type FeatureKey = "featureAccess" | "featureLocker" | "feature2Classes" | "featureUnlimitedClasses" | "featureTrainer";
@@ -9,10 +9,16 @@ const plans: { name: string; price: string; duration: number; featureKeys: Featu
   { name: "Premium", price: "€79", duration: 30, featureKeys: ["featureAccess", "featureLocker", "featureUnlimitedClasses", "featureTrainer"] },
 ];
 
-export default async function MembershipsPage() {
+export default async function MembershipsPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
+  console.log(`[DEBUG memberships] params.lang="${lang}" → getTranslations will now use this locale`);
   const tSubs = await getTranslations("subscriptions");
   const t = await getTranslations("memberships");
-
   return (
     <section className="py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">

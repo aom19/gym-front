@@ -1,5 +1,4 @@
-import { getTranslations } from "next-intl/server";
-import { getLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getUser } from "@/utils/auth";
 import {
@@ -9,10 +8,15 @@ import {
   BarChart3,
 } from "lucide-react";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const t = await getTranslations("home");
   const tNav = await getTranslations("nav");
-  const lang = await getLocale();
   const user = await getUser();
 
   const features = [

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getUser } from "@/utils/auth";
 import { Users, CreditCard, CheckSquare, DollarSign } from "lucide-react";
 
@@ -9,6 +9,7 @@ export default async function AdminDashboardPage({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
+  setRequestLocale(lang);
   const user = await getUser();
 
   if (!user || user.role !== "ADMIN") {

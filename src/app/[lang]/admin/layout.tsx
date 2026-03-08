@@ -1,16 +1,18 @@
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { getTranslations } from "next-intl/server";
-import { getLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const t = await getTranslations("nav");
-  const lang = await getLocale();
 
   return (
     <div className="flex min-h-screen bg-background">

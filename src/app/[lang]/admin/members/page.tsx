@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 
 const mockMembers = [
@@ -11,7 +11,13 @@ const mockMembers = [
   { id: 7, name: "Vasile Moraru", email: "vasile.m@example.com", phone: "+373 69 000 007", membership: "Premium", active: true },
 ];
 
-export default async function MembersPage() {
+export default async function MembersPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  setRequestLocale(lang);
   const t = await getTranslations("members");
 
   return (
