@@ -110,6 +110,10 @@
         "feature3Title": "Plăți",
         "feature3Desc": "Facturare automată, facturi și analize de venituri.",
         "feature4Title": "Analize",
+        "statMembers": "Membri Activi",
+        "statClasses": "Clase Săptămânale",
+        "statLocations": "Locații",
+        "statSatisfaction": "Rata de Satisfacție",
         "feature4Desc": "Informații în timp real despre performanța sălii tale."
     },
     "about": {

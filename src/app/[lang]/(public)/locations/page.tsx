@@ -1,5 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import Image from "next/image";
 import { MapPin, Clock, Phone } from "lucide-react";
+
+const locationImages = [
+  "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=640",
+  "https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg?auto=compress&cs=tinysrgb&w=640",
+  "https://images.pexels.com/photos/3912953/pexels-photo-3912953.jpeg?auto=compress&cs=tinysrgb&w=640",
+];
 
 export default async function LocationsPage({
   params,
@@ -41,23 +48,40 @@ export default async function LocationsPage({
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {locations.map((loc) => (
+          {locations.map((loc, i) => (
             <div
               key={loc.name}
-              className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 ring-1 ring-foreground/10"
+              className="group overflow-hidden rounded-2xl border border-border bg-card ring-1 ring-foreground/10 transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <h3 className="font-semibold text-foreground">{loc.name}</h3>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-                {loc.address}
+              {/* Image */}
+              <div className="relative h-44 overflow-hidden">
+                <Image
+                  src={locationImages[i % locationImages.length]}
+                  alt={loc.name}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <h3 className="absolute bottom-3 left-4 font-semibold text-white drop-shadow">
+                  {loc.name}
+                </h3>
               </div>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Clock className="mt-0.5 size-4 shrink-0 text-primary" />
-                {loc.hours}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="size-4 shrink-0 text-primary" />
-                {loc.phone}
+
+              {/* Card details */}
+              <div className="flex flex-col gap-3 p-5">
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+                  {loc.address}
+                </div>
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Clock className="mt-0.5 size-4 shrink-0 text-primary" />
+                  {loc.hours}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="size-4 shrink-0 text-primary" />
+                  {loc.phone}
+                </div>
               </div>
             </div>
           ))}

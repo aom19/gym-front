@@ -13,15 +13,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { MenuIcon, Dumbbell } from "lucide-react";
+import { MenuIcon, Dumbbell, Home, CreditCard, Calendar, MapPin, Info, Mail } from "lucide-react";
 
 const publicLinks = [
-  "home",
-  "memberships",
-  "classes",
-  "locations",
-  "about",
-  "contact",
+  { key: "home",        Icon: Home },
+  { key: "memberships", Icon: CreditCard },
+  { key: "classes",     Icon: Calendar },
+  { key: "locations",   Icon: MapPin },
+  { key: "about",       Icon: Info },
+  { key: "contact",     Icon: Mail },
 ] as const;
 
 export function PublicNavbar() {
@@ -51,16 +51,17 @@ export function PublicNavbar() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1 flex-1">
-          {publicLinks.map((key) => (
+          {publicLinks.map(({ key, Icon }) => (
             <Link
               key={key}
               href={hrefFor(key)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive(key)
                   ? "bg-muted text-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
+              <Icon className="size-3.5 shrink-0" />
               {t(key)}
             </Link>
           ))}
@@ -89,17 +90,18 @@ export function PublicNavbar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-64 pt-10">
               <nav className="flex flex-col gap-1 p-4">
-                {publicLinks.map((key) => (
+                {publicLinks.map(({ key, Icon }) => (
                   <Link
                     key={key}
                     href={hrefFor(key)}
                     onClick={() => setOpen(false)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive(key)
                         ? "bg-muted text-foreground"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
+                    <Icon className="size-4 shrink-0" />
                     {t(key)}
                   </Link>
                 ))}
@@ -119,3 +121,4 @@ export function PublicNavbar() {
     </header>
   );
 }
+                  

@@ -14,6 +14,26 @@ interface ResetPasswordResponse {
   message: string;
 }
 
+/** Returns 0-4 strength score for a password */
+function getPasswordStrength(pw: string): number {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.min(score, 4);
+}
+
+const strengthConfig = [
+  { label: "Too short",  bar: "bg-destructive",    text: "text-destructive" },
+  { label: "Weak",       bar: "bg-orange-500",      text: "text-orange-500" },
+  { label: "Fair",       bar: "bg-yellow-500",      text: "text-yellow-500" },
+  { label: "Good",       bar: "bg-blue-500",        text: "text-blue-500" },
+  { label: "Strong",     bar: "bg-green-500",        text: "text-green-500" },
+];
+
 export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,6 +51,8 @@ export function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null);
 
   const token = useMemo(() => tokenFromUrl || manualToken, [tokenFromUrl, manualToken]);
+  const strength = getPasswordStrength(password);
+  const strengthInfo = strengthConfig[strength];
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -124,6 +146,25 @@ export function ResetPasswordForm() {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
+
+        {/* Password strength indicator */}
+        {password.length > 0 && (
+          <div className="mt-2 space-y-1.5">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4].map((level) => (
+                <div
+                  key={level}
+                  className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                    strength >= level ? strengthInfo.bar : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className={`text-xs font-medium ${strengthInfo.text}`}>
+              {strengthInfo.label}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-2">

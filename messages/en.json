@@ -110,7 +110,11 @@
         "feature3Title": "Payments",
         "feature3Desc": "Automated billing, invoices and revenue analytics.",
         "feature4Title": "Analytics",
-        "feature4Desc": "Real-time insights into your gym performance."
+        "feature4Desc": "Real-time insights into your gym performance.",
+        "statMembers": "Active Members",
+        "statClasses": "Weekly Classes",
+        "statLocations": "Locations",
+        "statSatisfaction": "Satisfaction Rate"
     },
     "about": {
         "desc1": "GymPro is a premium fitness management platform designed to help gym owners, coaches, and members thrive. Our all-in-one solution eliminates the complexity of running a modern gym — from scheduling and payments to analytics and member engagement.",
