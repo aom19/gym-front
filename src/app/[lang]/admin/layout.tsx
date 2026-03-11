@@ -1,6 +1,7 @@
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LogoutButton } from "@/components/logout-button";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 export default async function AdminLayout({
@@ -23,14 +24,9 @@ export default async function AdminLayout({
         <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-3 border-b border-border bg-card/80 px-6 backdrop-blur">
           <LanguageSwitcher />
           <ThemeSwitcher />
-          <form action="/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition hover:bg-accent hover:text-accent-foreground"
-            >
-              {t("logout")}
-            </button>
-          </form>
+          <LogoutButton className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition hover:bg-accent hover:text-accent-foreground">
+            {t("logout")}
+          </LogoutButton>
         </header>
 
         {/* Page content */}

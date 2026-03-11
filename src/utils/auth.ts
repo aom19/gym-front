@@ -80,11 +80,26 @@ export async function getUser(): Promise<AuthUser | null> {
 
 export async function logout(): Promise<void> {
     if (typeof window !== "undefined") {
-        try {
-            await fetch("/auth/logout", { method: "POST" });
-        } catch {
-            // noop
+        // Revoke the refresh token server-side so the session is invalidated.
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (refreshToken) {
+            try {
+                await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ refreshToken }),
+                    },
+                );
+            } catch {
+                // noop — still clear local state even if the request fails
+            }
         }
+
+        // Clear cookies set on login.
+        document.cookie = "accessToken=; path=/; max-age=0; SameSite=Lax";
+        document.cookie = "user=; path=/; max-age=0; SameSite=Lax";
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");

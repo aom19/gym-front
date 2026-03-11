@@ -23,7 +23,7 @@ interface LoginResponse {
   };
 }
 
-const LOGIN_ENDPOINT = process.env.NEXT_PUBLIC_LOGIN_ENDPOINT ?? "http://localhost:3000/auth/login";
+const LOGIN_ENDPOINT =  `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
 
 export function LoginForm() {
   const router = useRouter();
@@ -67,7 +67,13 @@ export function LoginForm() {
 
       const data = payload as LoginResponse;
 
-      // Fallback persistence for environments where cookies are unavailable.
+      // Set cookies so the middleware and SSR server components can read them.
+      document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${15 * 60}; SameSite=Lax`;
+      if (data.user) {
+        document.cookie = `user=${encodeURIComponent(JSON.stringify(data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+      }
+
+      // localStorage fallback for client-side reads.
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
       if (data.user) {

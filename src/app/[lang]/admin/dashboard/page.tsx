@@ -11,7 +11,7 @@ export default async function AdminDashboardPage({
   const { lang } = await params;
   setRequestLocale(lang);
   const user = await getUser();
-
+console.log("Authenticated user:", user);
   if (!user || user.role !== "ADMIN") {
     redirect(`/${lang}/login`);
   }
