@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
+  UserCog,
   CreditCard,
   DollarSign,
   CheckSquare,
@@ -15,16 +16,19 @@ import {
   BarChart3,
   Settings,
   Dumbbell as GymLogo,
+  ShieldCheck,
 } from "lucide-react";
 
 const navItems = [
   { key: "dashboard", icon: LayoutDashboard, href: "dashboard" },
   { key: "members", icon: Users, href: "members" },
+  { key: "users", icon: UserCog, href: "users" },
   { key: "subscriptions", icon: CreditCard, href: "subscriptions" },
   { key: "payments", icon: DollarSign, href: "payments" },
   { key: "checkins", icon: CheckSquare, href: "checkins" },
   { key: "workouts", icon: Dumbbell, href: "workouts" },
   { key: "locations", icon: MapPin, href: "locations" },
+  { key: "roles", icon: ShieldCheck, href: "roles" },
   { key: "reports", icon: BarChart3, href: "reports" },
   { key: "settings", icon: Settings, href: "settings" },
 ] as const;

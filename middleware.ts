@@ -50,10 +50,11 @@ export function middleware(request: NextRequest) {
         }
 
         const payload = decodeJwtPayload(token);
+        const allowedRoles = ["ADMIN", "FRONT_DESK"];
 
         if (
             !payload ||
-            payload.role !== "ADMIN" ||
+            !allowedRoles.includes(payload.role ?? "") ||
             (payload.exp && payload.exp * 1000 < Date.now())
         ) {
             return NextResponse.redirect(new URL(`/${locale}/login`, request.url));

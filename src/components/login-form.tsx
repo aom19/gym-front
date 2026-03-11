@@ -87,6 +87,11 @@ export function LoginForm() {
         return;
       }
 
+      if (data.user?.role === "FRONT_DESK") {
+        router.replace(`/${lang}/admin/members`);
+        return;
+      }
+
       setError(tErrors("adminOnly"));
       toast.error(tErrors("adminOnly"));
     } catch {
