@@ -8,8 +8,9 @@ export interface MemberLocation {
 
 export interface ActiveSubscription {
     id: string;
-    isActive: boolean;
+    status: string;
     endDate: string;
+    entriesLeft: number | null;
     plan: { name: string };
 }
 

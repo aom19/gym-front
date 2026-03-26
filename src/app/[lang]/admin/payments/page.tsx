@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getUser } from "@/utils/auth";
-import { SubscriptionPlansTable } from "@/components/admin/subscription-plans-table";
+import { PaymentsTable } from "@/components/admin/payments-table";
 
-export default async function SubscriptionsPage({
+export default async function PaymentsPage({
   params,
 }: {
   params: Promise<{ lang: string }>;
@@ -18,7 +18,7 @@ export default async function SubscriptionsPage({
 
   return (
     <div className="space-y-6">
-      <SubscriptionPlansTable />
+      <PaymentsTable userRole={user.role} />
     </div>
   );
 }
