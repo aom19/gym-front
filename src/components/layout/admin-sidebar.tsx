@@ -19,6 +19,10 @@ import {
   ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
+  ClipboardList,
+  Calendar,
+  Clock,
+  TrendingUp,
 } from "lucide-react";
 
 interface NavItem {
@@ -47,6 +51,16 @@ const navGroups: NavGroup[] = [
       { key: "subscriptions", icon: CreditCard, href: "subscriptions" },
       { key: "payments", icon: DollarSign, href: "payments" },
       { key: "locations", icon: MapPin, href: "locations" },
+      { key: "schedule", icon: Clock, href: "schedule" },
+    ],
+  },
+  {
+    label: "training",
+    items: [
+      { key: "exercises", icon: Dumbbell, href: "exercises" },
+      { key: "workouts", icon: ClipboardList, href: "workouts" },
+      { key: "classes", icon: Calendar, href: "classes" },
+      { key: "progress", icon: TrendingUp, href: "progress" },
     ],
   },
   {

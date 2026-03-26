@@ -17,6 +17,12 @@
 - Plăți (CRUD complet, tabel, modal, badge-uri status, serviciu)
 - Servicii frontend: subscription-plans, subscriptions, payments, checkins
 - Traduceri i18n actualizate (subscriptions, checkins, payments)
+- Exerciții admin (pagină `/admin/exercises`, `ExercisesTable`, serviciu `exercises.ts`)
+- Antrenamente admin (pagină `/admin/workouts`, `WorkoutsTable`, serviciu `workouts.ts`)
+- Clase de grup admin (pagină `/admin/classes`, `GroupClassesTable`, serviciu `group-classes.ts`)
+- Pagină publică clase (`/classes`) — calendar clase disponibile
+- Program locație (`LocationScheduleManager`, serviciu `location-schedule.ts`)
+- Progres fitness admin (pagină `/admin/progress`, `FitnessProgressTable`, serviciu `fitness-progress.ts`)
 
 ---
 
@@ -60,23 +66,23 @@
 ## 🟡 Prioritate medie
 
 ### Exerciții & Antrenamente
-- [ ] Pagină `/admin/exercises` — CRUD exerciții (ADMIN, TRAINER)
-- [ ] Componentă `ExercisesTable` + Sheet formular cu grup muscular
-- [ ] Pagină `/admin/workouts` — listă antrenamente
+- [x] Pagină `/admin/exercises` — CRUD exerciții (ADMIN, TRAINER)
+- [x] Componentă `ExercisesTable` + Sheet formular cu grup muscular
+- [x] Pagină `/admin/workouts` — listă antrenamente
 - [ ] Componentă `WorkoutBuilder` — adăugare exerciții + seturi/reps/greutate
 - [ ] Pagina profil membru — secțiune "Istoric antrenamente"
-- [ ] Servicii `src/services/exercises.ts`, `src/services/workouts.ts`
+- [x] Servicii `src/services/exercises.ts`, `src/services/workouts.ts`
 
 ### Clase de grup
-- [ ] Pagină `/admin/classes` — CRUD clase (ADMIN, TRAINER)
-- [ ] Componentă `ClassesTable` cu status, instructor, dată, participanți
+- [x] Pagină `/admin/classes` — CRUD clase (ADMIN, TRAINER)
+- [x] Componentă `GroupClassesTable` cu status, instructor, dată, participanți
 - [ ] Modal creare/editare clasă: tip, instructor, locație, capacitate, dată/oră
 - [ ] Pagina `/admin/classes/:id/bookings` — lista participanților înscriși
 - [ ] Calendar săptămânal al claselor (vizualizare grilă)
-- [ ] Serviciu `src/services/classes.ts`
+- [x] Serviciu `src/services/classes.ts` (`group-classes.ts`)
 
 ### Rezervări clase (Member-facing)
-- [ ] Pagina publică `/classes` — calendar clase disponibile
+- [x] Pagina publică `/classes` — calendar clase disponibile
 - [ ] Buton "Rezervă" per clasă cu validare abonament
 - [ ] Pagina `/member/my-classes` — rezervările mele active + istorice
 - [ ] Buton anulare rezervare
@@ -88,14 +94,15 @@
 - [ ] Calendar personal trainer
 
 ### Program locație
-- [ ] Tab "Program" în pagina de detaliu a locației
-- [ ] Grid editabil pentru fiecare zi a săptămânii (oră deschis / oră închis / închis)
-- [ ] Butoane marcare sărbători / zile închise
+- [x] Tab "Program" în pagina de detaliu a locației
+- [x] Grid editabil pentru fiecare zi a săptămânii (oră deschis / oră închis / închis)
+- [x] Butoane marcare sărbători / zile închise
 
 ### Progres fitness (Member)
-- [ ] Pagina `/member/progress` — formular adăugare înregistrare (greutate, %grăsime, măsurători)
+- [x] Pagină `/admin/progress` — tabel înregistrări cu formular adăugare
+- [ ] Pagina `/member/progress` — vizualizare personală progres
 - [ ] Grafice evoluție: greutate în timp, progres măsurători (chart.js sau recharts)
-- [ ] Serviciu `src/services/progress.ts`
+- [x] Serviciu `src/services/progress.ts` (`fitness-progress.ts`)
 
 ---
 
