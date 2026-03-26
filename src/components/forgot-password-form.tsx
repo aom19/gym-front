@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
-import { Button } from "@/components/ui/Button";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface ForgotPasswordResponse {
@@ -12,6 +14,10 @@ interface ForgotPasswordResponse {
 }
 
 export function ForgotPasswordForm() {
+  const params = useParams();
+  const lang = (params?.lang as string) || "ro";
+  const t = useTranslations("auth");
+
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -41,9 +47,10 @@ export function ForgotPasswordForm() {
         return;
       }
 
-      const successMessage = "message" in payload
-        ? payload.message ?? "If the email exists, a reset link has been sent."
-        : "If the email exists, a reset link has been sent.";
+      const successMessage =
+        "message" in payload
+          ? (payload.message ?? t("emailSent"))
+          : t("emailSent");
       setMessage(successMessage);
       toast.success(successMessage);
     } catch {
@@ -58,8 +65,8 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-5">
       <div className="grid gap-2">
-        <label htmlFor="email" className="text-sm font-medium text-slate-700">
-          Email
+        <label htmlFor="email" className="text-sm font-medium text-foreground">
+          {t("email")}
         </label>
         <Input
           id="email"
@@ -73,16 +80,20 @@ export function ForgotPasswordForm() {
         />
       </div>
 
-      {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {message ? <p className="text-sm text-emerald-600">{message}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button type="submit" disabled={isLoading} className="h-11">
-        {isLoading ? "Sending..." : "Send reset link"}
+        {isLoading ? "Sending..." : t("forgotButton")}
       </Button>
 
-      <Link href="/login" className="text-sm font-medium text-slate-700 underline-offset-4 hover:underline">
-        Back to login
+      <Link
+        href={`/${lang}/login`}
+        className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
+      >
+        {t("backToLogin")}
       </Link>
     </form>
   );
 }
+

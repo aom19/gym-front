@@ -1,4 +1,6 @@
+import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
+import { routing } from "./src/i18n/routing";
 
 interface JwtPayload {
     role?: string;
@@ -7,48 +9,63 @@ interface JwtPayload {
 
 function decodeJwtPayload(token: string): JwtPayload | null {
     const parts = token.split(".");
-
-    if (parts.length !== 3) {
-        return null;
-    }
-
+    if (parts.length !== 3) return null;
     try {
-        const payload = parts[1]
+        const b64 = parts[1]
             .replace(/-/g, "+")
             .replace(/_/g, "/")
             .padEnd(Math.ceil(parts[1].length / 4) * 4, "=");
-
-        const decoded = Buffer.from(payload, "base64").toString("utf8");
-        return JSON.parse(decoded) as JwtPayload;
+        return JSON.parse(Buffer.from(b64, "base64").toString("utf8")) as JwtPayload;
     } catch {
         return null;
     }
 }
 
+const intlMiddleware = createMiddleware(routing);
+
 export function middleware(request: NextRequest) {
-    if (!request.nextUrl.pathname.startsWith("/admin")) {
+    const { pathname } = request.nextUrl;
+
+    // Skip internal Next.js routes and static assets
+    if (
+        pathname.startsWith("/_next") ||
+        pathname.startsWith("/favicon") ||
+        pathname.match(/\.\w+$/)
+    ) {
         return NextResponse.next();
     }
 
-    const token = request.cookies.get("accessToken")?.value;
-
-    if (!token) {
-        return NextResponse.redirect(new URL("/login", request.url));
+    // Skip API route handlers — they handle their own auth
+    if (pathname.startsWith("/auth/") || pathname.startsWith("/users/")) {
+        return NextResponse.next();
     }
 
-    const payload = decodeJwtPayload(token);
+    // Protect /{lang}/admin/* routes
+    if (/^\/(?:ro|en|ru)\/admin/.test(pathname)) {
+        const token = request.cookies.get("accessToken")?.value;
+        const locale = pathname.split("/")[1] ?? "ro";
 
-    if (!payload || payload.role !== "ADMIN") {
-        return NextResponse.redirect(new URL("/login", request.url));
+        if (!token) {
+            return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+        }
+
+        const payload = decodeJwtPayload(token);
+        const allowedRoles = ["ADMIN", "FRONT_DESK"];
+
+        if (
+            !payload ||
+            !allowedRoles.includes(payload.role ?? "") ||
+            (payload.exp && payload.exp * 1000 < Date.now())
+        ) {
+            return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+        }
     }
 
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-        return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    return NextResponse.next();
+    // Let next-intl handle locale detection / prefixing for everything else
+    return intlMiddleware(request);
 }
 
 export const config = {
-    matcher: ["/admin/:path*"],
+    matcher: ["/((?!_next|.*\\..*).*)"],
 };
+

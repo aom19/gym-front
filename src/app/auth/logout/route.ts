@@ -1,31 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export async function POST() {
-    const response = NextResponse.json({ ok: true });
+export async function POST(request: NextRequest) {
+    const store = await cookies();
+    const locale = store.get("lang")?.value ?? "ro";
 
-    response.cookies.set("accessToken", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 0,
-    });
+    store.delete("accessToken");
+    store.delete("user");
 
-    response.cookies.set("refreshToken", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 0,
-    });
-
-    response.cookies.set("user", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 0,
-    });
-
-    return response;
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
 }

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import { Button } from "@/components/ui/Button";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface ResetPasswordResponse {
@@ -13,9 +14,32 @@ interface ResetPasswordResponse {
   message: string;
 }
 
+/** Returns 0-4 strength score for a password */
+function getPasswordStrength(pw: string): number {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.min(score, 4);
+}
+
+const strengthConfig = [
+  { label: "Too short",  bar: "bg-destructive",    text: "text-destructive" },
+  { label: "Weak",       bar: "bg-orange-500",      text: "text-orange-500" },
+  { label: "Fair",       bar: "bg-yellow-500",      text: "text-yellow-500" },
+  { label: "Good",       bar: "bg-blue-500",        text: "text-blue-500" },
+  { label: "Strong",     bar: "bg-green-500",        text: "text-green-500" },
+];
+
 export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  const lang = (params?.lang as string) || "ro";
+  const t = useTranslations("auth");
   const tokenFromUrl = searchParams.get("token") ?? "";
 
   const [manualToken, setManualToken] = useState("");
@@ -27,6 +51,8 @@ export function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null);
 
   const token = useMemo(() => tokenFromUrl || manualToken, [tokenFromUrl, manualToken]);
+  const strength = getPasswordStrength(password);
+  const strengthInfo = strengthConfig[strength];
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,7 +92,7 @@ export function ResetPasswordForm() {
         ? payload.message ?? "Password updated successfully."
         : "Password updated successfully.";
       toast.success(successMessage);
-      router.replace("/login");
+      router.replace(`/${lang}/login`);
     } catch {
       const fallback = "Unexpected error. Please try again.";
       setError(fallback);
@@ -80,8 +106,8 @@ export function ResetPasswordForm() {
     <form onSubmit={handleSubmit} className="grid gap-5">
       {!tokenFromUrl ? (
         <div className="grid gap-2">
-          <label htmlFor="token" className="text-sm font-medium text-slate-700">
-            Reset Token
+          <label htmlFor="token" className="text-sm font-medium text-foreground">
+            {t("resetToken")}
           </label>
           <Input
             id="token"
@@ -89,15 +115,15 @@ export function ResetPasswordForm() {
             type="text"
             value={manualToken}
             onChange={(event) => setManualToken(event.target.value)}
-            placeholder="Paste token from email"
+            placeholder={t("resetTokenPlaceholder")}
             required
           />
         </div>
       ) : null}
 
       <div className="grid gap-2">
-        <label htmlFor="password" className="text-sm font-medium text-slate-700">
-          New Password
+        <label htmlFor="password" className="text-sm font-medium text-foreground">
+          {t("newPassword")}
         </label>
         <div className="relative">
           <Input
@@ -114,17 +140,36 @@ export function ResetPasswordForm() {
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
+
+        {/* Password strength indicator */}
+        {password.length > 0 && (
+          <div className="mt-2 space-y-1.5">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4].map((level) => (
+                <div
+                  key={level}
+                  className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                    strength >= level ? strengthInfo.bar : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className={`text-xs font-medium ${strengthInfo.text}`}>
+              {strengthInfo.label}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">
-          Confirm Password
+        <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+          {t("confirmPassword")}
         </label>
         <div className="relative">
           <Input
@@ -141,7 +186,7 @@ export function ResetPasswordForm() {
           <button
             type="button"
             onClick={() => setShowConfirmPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
             aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
           >
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -149,14 +194,17 @@ export function ResetPasswordForm() {
         </div>
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button type="submit" disabled={isLoading} className="h-11">
-        {isLoading ? "Updating..." : "Reset password"}
+        {isLoading ? "Updating..." : t("resetButton")}
       </Button>
 
-      <Link href="/login" className="text-sm font-medium text-slate-700 underline-offset-4 hover:underline">
-        Back to login
+      <Link
+        href={`/${lang}/login`}
+        className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
+      >
+        {t("backToLogin")}
       </Link>
     </form>
   );
