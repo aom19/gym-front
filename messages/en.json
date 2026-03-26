@@ -3,6 +3,7 @@
         "dashboard": "Dashboard",
         "settings": "Settings",
         "logout": "Logout",
+        "search": "Search…",
         "login": "Login",
         "home": "Home",
         "memberships": "Memberships",
@@ -66,7 +67,10 @@
         "locations": "Locations",
         "roles": "Roles & Permissions",
         "reports": "Reports",
-        "settings": "Settings"
+        "settings": "Settings",
+        "main": "Main",
+        "management": "Management",
+        "system": "System"
     },
     "members": {
         "title": "Members",

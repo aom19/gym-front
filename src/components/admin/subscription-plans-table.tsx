@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -167,7 +167,7 @@ export function SubscriptionPlansTable() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+                    <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
                 <Button
@@ -184,37 +184,44 @@ export function SubscriptionPlansTable() {
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-border bg-card ring-1 ring-foreground/10 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b border-border bg-muted/50">
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("plan")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">{t("price")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">{t("duration")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">{t("maxEntries")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">{t("members")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("status")}</th>
-                            <th className="px-4 py-3 text-right font-medium text-muted-foreground">{t("actions")}</th>
+                        <tr className="border-b border-border/60 bg-muted/30">
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("plan")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("price")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("duration")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("maxEntries")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("members")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("status")}</th>
+                            <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr>
-                                <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                                    {t("loading")}
-                                </td>
-                            </tr>
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <tr key={i} className="border-b border-border last:border-0">
+                                    <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 w-12 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden md:table-cell"><div className="h-4 w-16 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden lg:table-cell"><div className="h-4 w-10 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden lg:table-cell"><div className="h-4 w-8 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3"><div className="h-5 w-14 rounded-full skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
+                                </tr>
+                            ))
                         ) : plans.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                                    {t("noPlans")}
+                                <td colSpan={7} className="px-4 py-16 text-center">
+                                    <CreditCard className="mx-auto mb-3 size-8 text-muted-foreground/40" />
+                                    <p className="text-sm font-medium text-muted-foreground">{t("noPlans")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            plans.map((plan, i) => (
+                            plans.map((plan) => (
                                 <tr
                                     key={plan.id}
-                                    className={`border-b border-border last:border-0 hover:bg-muted/40 transition-colors ${i % 2 !== 0 ? "bg-muted/20" : ""}`}
+                                    className="group table-row-hover border-b border-border last:border-0"
                                 >
                                     <td className="px-4 py-3">
                                         <div>
@@ -246,7 +253,7 @@ export function SubscriptionPlansTable() {
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-right">
-                                        <div className="flex items-center justify-end gap-1">
+                                        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                             <Button variant="ghost" size="icon-sm" onClick={() => openEdit(plan)} aria-label="Edit plan">
                                                 <Pencil className="size-3.5" />
                                             </Button>
@@ -355,7 +362,7 @@ export function SubscriptionPlansTable() {
             {/* Delete confirmation */}
             {deleteTarget ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="rounded-2xl border border-border bg-card p-6 shadow-xl w-full max-w-sm mx-4">
+                    <div className="rounded-xl border border-border bg-card p-5 shadow-lg w-full max-w-sm mx-4">
                         <h2 className="text-base font-semibold text-foreground">{t("deletePlan")}</h2>
                         <p className="mt-2 text-sm text-muted-foreground">
                             {t("deleteConfirm")}{" "}

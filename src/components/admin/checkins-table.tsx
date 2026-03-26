@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { LogIn, LogOut, Plus } from "lucide-react";
+import { LogIn, LogOut, Plus, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -108,7 +108,7 @@ export function CheckinsTable() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+                    <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
                 <Button
@@ -155,39 +155,44 @@ export function CheckinsTable() {
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-border bg-card ring-1 ring-foreground/10 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b border-border bg-muted/50">
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("member")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("time")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">{t("checkout")}</th>
-                            <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">{t("location")}</th>
-                            <th className="px-4 py-3 text-right font-medium text-muted-foreground">{t("actions")}</th>
+                        <tr className="border-b border-border/60 bg-muted/30">
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("member")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("time")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("checkout")}</th>
+                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("location")}</th>
+                            <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr>
-                                <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
-                                    {t("loading")}
-                                </td>
-                            </tr>
+                            Array.from({ length: 5 }).map((_, i) => (
+                                <tr key={i} className="border-b border-border last:border-0">
+                                    <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3"><div className="h-4 w-16 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 w-16 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3 hidden md:table-cell"><div className="h-4 w-20 rounded-md skeleton-shimmer" /></td>
+                                    <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
+                                </tr>
+                            ))
                         ) : checkins.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
-                                    {t("noCheckins")}
+                                <td colSpan={5} className="px-4 py-16 text-center">
+                                    <CheckSquare className="mx-auto mb-3 size-8 text-muted-foreground/40" />
+                                    <p className="text-sm font-medium text-muted-foreground">{t("noCheckins")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            checkins.map((checkin, i) => (
+                            checkins.map((checkin) => (
                                 <tr
                                     key={checkin.id}
-                                    className={`border-b border-border last:border-0 hover:bg-muted/40 transition-colors ${i % 2 !== 0 ? "bg-muted/20" : ""}`}
+                                    className="group table-row-hover border-b border-border last:border-0"
                                 >
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/8 text-[11px] font-semibold text-primary">
                                                 {checkin.member.firstName[0]}
                                             </div>
                                             <span className="font-medium text-foreground">
@@ -220,7 +225,7 @@ export function CheckinsTable() {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => handleCheckout(checkin.id)}
-                                                className="gap-1"
+                                                className="gap-1 opacity-0 transition-opacity group-hover:opacity-100"
                                             >
                                                 <LogOut className="size-3.5" />
                                                 {t("checkOut")}

@@ -22,17 +22,16 @@ export function ThemeSwitcher() {
   }, []);
 
   if (!mounted) {
-    return <div className="h-8 w-28 rounded-lg border border-border bg-card" />;
+    return <div className="h-7 w-24 rounded-md border border-border bg-card" />;
   }
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
+    <div className="flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
       {THEMES.map(({ value, Icon }) => (
         <button
           key={value}
           onClick={() => {
             setTheme(value);
-            // Sync with API (fire and forget)
             fetch("/users/preferences", {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
@@ -42,13 +41,13 @@ export function ThemeSwitcher() {
           }}
           title={t(value as "light" | "dark" | "forest")}
           aria-pressed={theme === value}
-          className={`rounded-md p-1.5 transition ${
+          className={`rounded p-1 transition ${
             theme === value
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           }`}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <Icon className="h-3 w-3" />
           <span className="sr-only">{t(value as "light" | "dark" | "forest")}</span>
         </button>
       ))}

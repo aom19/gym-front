@@ -3,6 +3,7 @@
         "dashboard": "Панель управления",
         "settings": "Настройки",
         "logout": "Выход",
+        "search": "Поиск…",
         "login": "Войти",
         "home": "Главная",
         "memberships": "Абонементы",
@@ -66,7 +67,10 @@
         "locations": "Локации",
         "roles": "Роли и права",
         "reports": "Отчёты",
-        "settings": "Настройки"
+        "settings": "Настройки",
+        "main": "Главное",
+        "management": "Управление",
+        "system": "Система"
     },
     "members": {
         "title": "Участники",

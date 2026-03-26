@@ -3,6 +3,7 @@
         "dashboard": "Panou de control",
         "settings": "Setări",
         "logout": "Deconectare",
+        "search": "Căutare…",
         "login": "Autentificare",
         "home": "Acasă",
         "memberships": "Abonamente",
@@ -66,7 +67,10 @@
         "locations": "Locații",
         "roles": "Roluri & Permisiuni",
         "reports": "Rapoarte",
-        "settings": "Setări"
+        "settings": "Setări",
+        "main": "Principal",
+        "management": "Gestionare",
+        "system": "Sistem"
     },
     "members": {
         "title": "Membri",
