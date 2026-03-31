@@ -640,5 +640,32 @@
         "full": "Class Full",
         "loginRequired": "Please log in to book a class",
         "bookSuccess": "Class booked successfully!"
+    },
+    "errorBoundary": {
+        "title": "Something went wrong",
+        "description": "An unexpected error occurred.",
+        "retry": "Try again"
+    },
+    "reports": {
+        "title": "Reports",
+        "subtitle": "Overview of gym performance and statistics",
+        "loadError": "Failed to load report data",
+        "totalMembers": "Total Members",
+        "totalRevenue": "Total Revenue",
+        "totalCheckins": "Total Check-ins",
+        "monthRevenue": "Revenue This Month",
+        "monthCheckins": "Check-ins This Month",
+        "upcomingClasses": "Upcoming Classes",
+        "revenueChart": "Revenue (Last 6 Months)",
+        "checkinsChart": "Check-ins (Last 6 Months)",
+        "paymentMethods": "Payment Methods",
+        "planPopularity": "Plan Popularity",
+        "newMembersChart": "New Members (Last 6 Months)",
+        "classTypes": "Class Types",
+        "revenue": "Revenue",
+        "checkins": "Check-ins",
+        "members": "Members",
+        "subscriptions": "Subscriptions",
+        "noData": "No data available"
     }
 }

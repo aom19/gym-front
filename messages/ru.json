@@ -640,5 +640,32 @@
         "full": "Мест нет",
         "loginRequired": "Войдите для бронирования",
         "bookSuccess": "Занятие забронировано!"
+    },
+    "errorBoundary": {
+        "title": "Что-то пошло не так",
+        "description": "Произошла непредвиденная ошибка.",
+        "retry": "Попробовать снова"
+    },
+    "reports": {
+        "title": "Отчёты",
+        "subtitle": "Обзор показателей и статистики зала",
+        "loadError": "Ошибка загрузки данных",
+        "totalMembers": "Всего участников",
+        "totalRevenue": "Общий доход",
+        "totalCheckins": "Всего визитов",
+        "monthRevenue": "Доход за месяц",
+        "monthCheckins": "Визиты за месяц",
+        "upcomingClasses": "Предстоящие занятия",
+        "revenueChart": "Доход (последние 6 месяцев)",
+        "checkinsChart": "Визиты (последние 6 месяцев)",
+        "paymentMethods": "Способы оплаты",
+        "planPopularity": "Популярность абонементов",
+        "newMembersChart": "Новые участники (последние 6 месяцев)",
+        "classTypes": "Типы занятий",
+        "revenue": "Доход",
+        "checkins": "Визиты",
+        "members": "Участники",
+        "subscriptions": "Абонементы",
+        "noData": "Нет данных"
     }
 }

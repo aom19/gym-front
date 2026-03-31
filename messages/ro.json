@@ -640,5 +640,32 @@
         "full": "Clasă plină",
         "loginRequired": "Autentifică-te pentru a rezerva",
         "bookSuccess": "Clasă rezervată cu succes!"
+    },
+    "errorBoundary": {
+        "title": "Ceva nu a funcționat",
+        "description": "A apărut o eroare neașteptată.",
+        "retry": "Încearcă din nou"
+    },
+    "reports": {
+        "title": "Rapoarte",
+        "subtitle": "Prezentare generală a performanței și statisticilor",
+        "loadError": "Eroare la încărcarea datelor",
+        "totalMembers": "Total Membri",
+        "totalRevenue": "Venituri Totale",
+        "totalCheckins": "Total Check-in-uri",
+        "monthRevenue": "Venituri Luna Aceasta",
+        "monthCheckins": "Check-in-uri Luna Aceasta",
+        "upcomingClasses": "Clase Viitoare",
+        "revenueChart": "Venituri (Ultimele 6 Luni)",
+        "checkinsChart": "Check-in-uri (Ultimele 6 Luni)",
+        "paymentMethods": "Metode de Plată",
+        "planPopularity": "Popularitate Abonamente",
+        "newMembersChart": "Membri Noi (Ultimele 6 Luni)",
+        "classTypes": "Tipuri de Clase",
+        "revenue": "Venituri",
+        "checkins": "Check-in-uri",
+        "members": "Membri",
+        "subscriptions": "Abonamente",
+        "noData": "Nu sunt date disponibile"
     }
 }
