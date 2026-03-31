@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface FitnessProgressMember {
     id: string;
@@ -39,9 +40,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getFitnessProgress(memberId: string): Promise<FitnessProgress[]> {
+export async function getFitnessProgress(memberId: string, params?: PaginationParams): Promise<PaginatedResult<FitnessProgress>> {
     try {
-        const { data } = await api.get<FitnessProgress[]>(`/progress/member/${memberId}`, { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<FitnessProgress>>(`/progress/member/${memberId}`, { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

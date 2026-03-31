@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, Dumbbell } from "lucide-react";
+import { Pencil, Trash2, Plus, Dumbbell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,9 @@ import {
     SheetTitle,
     SheetFooter,
 } from "@/components/ui/sheet";
+import { useServerTable, type PaginationParams } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     getExercises,
     createExercise,
@@ -37,8 +40,6 @@ const emptyForm: FormState = { name: "", description: "", muscleGroup: "", video
 export function ExercisesTable() {
     const t = useTranslations("exercises");
 
-    const [exercises, setExercises] = useState<Exercise[]>([]);
-    const [loading, setLoading] = useState(true);
     const [filterGroup, setFilterGroup] = useState<MuscleGroup | "">("");
 
     const [createOpen, setCreateOpen] = useState(false);
@@ -49,19 +50,22 @@ export function ExercisesTable() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadExercises = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getExercises(filterGroup || undefined);
-            setExercises(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t("errors.generic"));
-        } finally {
-            setLoading(false);
-        }
-    }, [filterGroup, t]);
+    const fetchExercises = useCallback(
+        (params: PaginationParams) =>
+            getExercises({ ...params, muscleGroup: filterGroup || undefined }),
+        [filterGroup]
+    );
 
-    useEffect(() => { loadExercises(); }, [loadExercises]);
+    const table = useServerTable<Exercise>({
+        fetchFn: fetchExercises,
+        pageSize: 10,
+        defaultSort: "name",
+        defaultOrder: "asc",
+    });
+
+    useEffect(() => {
+        table.setPage(1);
+    }, [filterGroup]);
 
     const openEdit = (ex: Exercise) => {
         setEditExercise(ex);
@@ -97,7 +101,7 @@ export function ExercisesTable() {
                 ...(form.videoUrl ? { videoUrl: form.videoUrl } : {}),
                 ...(form.imageUrl ? { imageUrl: form.imageUrl } : {}),
             });
-            setExercises((prev) => [created, ...prev]);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -119,8 +123,8 @@ export function ExercisesTable() {
             if (form.videoUrl !== (editExercise.videoUrl ?? "")) payload.videoUrl = form.videoUrl || undefined;
             if (form.imageUrl !== (editExercise.imageUrl ?? "")) payload.imageUrl = form.imageUrl || undefined;
 
-            const updated = await updateExercise(editExercise.id, payload);
-            setExercises((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+            await updateExercise(editExercise.id, payload);
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -135,7 +139,7 @@ export function ExercisesTable() {
         setSubmitting(true);
         try {
             await deleteExercise(deleteTarget.id);
-            setExercises((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -156,6 +160,15 @@ export function ExercisesTable() {
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
                     <select
                         className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
                         value={filterGroup}
@@ -184,14 +197,14 @@ export function ExercisesTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("name")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">{t("muscleGroup")}</th>
+                            <SortableHeader label={t("name")} sortKey="name" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("muscleGroup")} sortKey="muscleGroup" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("description")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-32 rounded-md skeleton-shimmer" /></td>
@@ -200,7 +213,7 @@ export function ExercisesTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : exercises.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="px-4 py-16 text-center">
                                     <Dumbbell className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -208,7 +221,7 @@ export function ExercisesTable() {
                                 </td>
                             </tr>
                         ) : (
-                            exercises.map((ex) => (
+                            table.items.map((ex) => (
                                 <tr key={ex.id} className="group table-row-hover border-b border-border last:border-0">
                                     <td className="px-4 py-3">
                                         <span className="font-medium text-foreground">{ex.name}</span>
@@ -234,6 +247,15 @@ export function ExercisesTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             <Sheet open={isSheetOpen} onOpenChange={(open) => { if (!open) closeSheet(); }}>

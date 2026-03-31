@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, CreditCard } from "lucide-react";
+import { Pencil, Trash2, Plus, CreditCard, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -44,8 +47,11 @@ const emptyForm: FormState = {
 export function SubscriptionPlansTable() {
     const t = useTranslations("subscriptions");
 
-    const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-    const [loading, setLoading] = useState(true);
+    const table = useServerTable<SubscriptionPlan>({
+        fetchFn: getSubscriptionPlans,
+        pageSize: 10,
+        defaultSort: "createdAt",
+    });
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editPlan, setEditPlan] = useState<SubscriptionPlan | null>(null);
@@ -54,22 +60,6 @@ export function SubscriptionPlansTable() {
     const [form, setForm] = useState<FormState>(emptyForm);
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
-
-    const loadPlans = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getSubscriptionPlans();
-            setPlans(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading plans");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadPlans();
-    }, [loadPlans]);
 
     const openEdit = (plan: SubscriptionPlan) => {
         setEditPlan(plan);
@@ -107,8 +97,8 @@ export function SubscriptionPlansTable() {
                 ...(form.maxEntries ? { maxEntries: parseInt(form.maxEntries) } : {}),
                 isActive: form.isActive,
             };
-            const created = await createSubscriptionPlan(payload);
-            setPlans((prev) => [created, ...prev]);
+            await createSubscriptionPlan(payload);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -133,8 +123,8 @@ export function SubscriptionPlansTable() {
             }
             if (form.isActive !== editPlan.isActive) payload.isActive = form.isActive;
 
-            const updated = await updateSubscriptionPlan(editPlan.id, payload);
-            setPlans((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+            await updateSubscriptionPlan(editPlan.id, payload);
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -149,7 +139,7 @@ export function SubscriptionPlansTable() {
         setSubmitting(true);
         try {
             await deleteSubscriptionPlan(deleteTarget.id);
-            setPlans((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -170,17 +160,28 @@ export function SubscriptionPlansTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm(emptyForm);
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("addPlan")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setForm(emptyForm);
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("addPlan")}
+                    </Button>
+                </div>
             </div>
 
             {/* Table */}
@@ -188,17 +189,17 @@ export function SubscriptionPlansTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("plan")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("price")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("duration")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("maxEntries")}</th>
+                            <SortableHeader label={t("plan")} sortKey="name" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("price")} sortKey="price" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("duration")} sortKey="durationInDays" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("maxEntries")} sortKey="maxEntries" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("members")}</th>
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("status")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 4 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -210,7 +211,7 @@ export function SubscriptionPlansTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : plans.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-16 text-center">
                                     <CreditCard className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -218,7 +219,7 @@ export function SubscriptionPlansTable() {
                                 </td>
                             </tr>
                         ) : (
-                            plans.map((plan) => (
+                            table.items.map((plan) => (
                                 <tr
                                     key={plan.id}
                                     className="group table-row-hover border-b border-border last:border-0"
@@ -267,6 +268,15 @@ export function SubscriptionPlansTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* Create / Edit Sheet */}

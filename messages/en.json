@@ -109,7 +109,9 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search members…",
+        "noResults": "No members match your search"
     },
     "users": {
         "title": "Users",
@@ -141,7 +143,8 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search users…"
     },
     "subscriptions": {
         "title": "Subscription Plans",
@@ -180,7 +183,8 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search plans…"
     },
     "checkins": {
         "title": "Check-ins",
@@ -189,6 +193,7 @@
         "time": "Check-in",
         "checkout": "Check-out",
         "location": "Location",
+        "actions": "Actions",
         "checkedInBy": "Checked in by",
         "noCheckins": "No check-ins today",
         "todayCheckins": "Today's Check-ins",
@@ -205,7 +210,9 @@
         "filterByLocation": "All Locations",
         "cancel": "Cancel",
         "save": "Save",
-        "saving": "Saving…"
+        "saving": "Saving…",
+        "search": "Search check-ins…",
+        "noResults": "No check-ins match your search"
     },
     "payments": {
         "title": "Payments",
@@ -248,7 +255,9 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search payments…",
+        "noResults": "No payments match your search"
     },
     "home": {
         "heroTitle": "The smarter way to manage your gym",
@@ -346,7 +355,8 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search locations…"
     },
     "roles": {
         "title": "Roles & Permissions",
@@ -378,7 +388,8 @@
         "save": "Save",
         "saving": "Saving…",
         "delete": "Delete",
-        "deleting": "Deleting…"
+        "deleting": "Deleting…",
+        "search": "Search roles…"
     },
     "exercises": {
         "title": "Exercises",
@@ -411,7 +422,8 @@
         "deleting": "Deleting…",
         "errors": {
             "generic": "An error occurred"
-        }
+        },
+        "search": "Search exercises…"
     },
     "workouts": {
         "title": "Workouts",
@@ -452,7 +464,8 @@
         "deleting": "Deleting…",
         "errors": {
             "generic": "An error occurred"
-        }
+        },
+        "search": "Search workouts…"
     },
     "groupClasses": {
         "title": "Group Classes",
@@ -495,7 +508,8 @@
         "deleting": "Deleting…",
         "errors": {
             "generic": "An error occurred"
-        }
+        },
+        "search": "Search classes…"
     },
     "locationSchedule": {
         "title": "Location Schedule",
@@ -545,7 +559,8 @@
             "generic": "An error occurred"
         },
         "weightTrend": "Weight Trend",
-        "bodyFatTrend": "Body Fat Trend"
+        "bodyFatTrend": "Body Fat Trend",
+        "search": "Search records…"
     },
     "checkinsHistory": {
         "title": "Check-in History",
@@ -566,7 +581,8 @@
         "results": "results",
         "min": "min",
         "inProgress": "In progress",
-        "exportCSV": "Export CSV"
+        "exportCSV": "Export CSV",
+        "search": "Search check-ins…"
     },
     "memberSubscriptions": {
         "title": "Subscriptions",
@@ -667,5 +683,17 @@
         "members": "Members",
         "subscriptions": "Subscriptions",
         "noData": "No data available"
+    },
+    "table": {
+        "showing": "Showing {from}–{to} of {total}",
+        "firstPage": "First page",
+        "previousPage": "Previous page",
+        "nextPage": "Next page",
+        "lastPage": "Last page"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "description": "The page you are looking for does not exist or has been moved.",
+        "goHome": "Go home"
     }
 }

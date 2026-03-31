@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Trash2, Plus, TrendingUp } from "lucide-react";
+import { Trash2, Plus, TrendingUp, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +21,9 @@ import {
 } from "@/services/fitness-progress";
 import { getMembers, type Member } from "@/services/members";
 import { FitnessProgressCharts } from "@/components/admin/fitness-progress-charts";
+import { useServerTable, PaginationParams } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 interface FormState {
     memberId: string;
@@ -37,8 +40,6 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
 
     const [members, setMembers] = useState<Member[]>([]);
     const [selectedMemberId, setSelectedMemberId] = useState<string>("");
-    const [progress, setProgress] = useState<FitnessProgress[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<FitnessProgress | null>(null);
@@ -47,30 +48,34 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
+    const fetchProgress = useCallback(
+        (params: PaginationParams) => {
+            if (!selectedMemberId) {
+                return Promise.resolve({ data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } });
+            }
+            return getFitnessProgress(selectedMemberId, params);
+        },
+        [selectedMemberId]
+    );
+
+    const table = useServerTable<FitnessProgress>({
+        fetchFn: fetchProgress,
+        pageSize: 10,
+        defaultSort: "recordedAt",
+    });
+
     useEffect(() => {
-        getMembers()
-            .then((m) => {
-                setMembers(m);
-                if (m.length > 0) setSelectedMemberId(m[0].id);
+        table.setPage(1);
+    }, [selectedMemberId]);
+
+    useEffect(() => {
+        getMembers({ limit: 0 })
+            .then((r) => {
+                setMembers(r.data);
+                if (r.data.length > 0) setSelectedMemberId(r.data[0].id);
             })
-            .catch(() => {})
-            .finally(() => setLoading(false));
+            .catch(() => {});
     }, []);
-
-    const loadProgress = useCallback(async () => {
-        if (!selectedMemberId) return;
-        setLoading(true);
-        try {
-            const data = await getFitnessProgress(selectedMemberId);
-            setProgress(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t("errors.generic"));
-        } finally {
-            setLoading(false);
-        }
-    }, [selectedMemberId, t]);
-
-    useEffect(() => { loadProgress(); }, [loadProgress]);
 
     const closeSheet = () => {
         setCreateOpen(false);
@@ -92,7 +97,7 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                 ...(form.notes ? { notes: form.notes } : {}),
             });
             if (memberId === selectedMemberId) {
-                setProgress((prev) => [created, ...prev]);
+                table.refetch();
             }
             toast.success(t("createSuccess"));
             closeSheet();
@@ -108,7 +113,7 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         try {
             await deleteFitnessProgress(deleteTarget.id);
-            setProgress((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -128,6 +133,15 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
                     <select
                         className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
                         value={selectedMemberId}
@@ -151,23 +165,23 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
             </div>
 
             {/* Charts */}
-            {!loading && progress.length >= 2 && (
-                <FitnessProgressCharts data={progress} />
+            {!table.loading && table.items.length >= 2 && (
+                <FitnessProgressCharts data={table.items} />
             )}
 
             <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("date")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("weightCol")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">{t("bodyFat")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("notes")}</th>
+                            <SortableHeader label={t("date")} sortKey="recordedAt" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("weightCol")} sortKey="weight" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("bodyFat")} sortKey="bodyFat" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("notes")} sortKey="notes" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
                             <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 4 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-24 rounded-md skeleton-shimmer" /></td>
@@ -177,7 +191,7 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                                     <td className="px-4 py-3"><div className="h-4 w-8 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : progress.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-4 py-16 text-center">
                                     <TrendingUp className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -189,7 +203,7 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                                 </td>
                             </tr>
                         ) : (
-                            progress.map((p) => (
+                            table.items.map((p) => (
                                 <tr key={p.id} className="group table-row-hover border-b border-border last:border-0">
                                     <td className="px-4 py-3 text-foreground">{new Date(p.recordedAt).toLocaleDateString()}</td>
                                     <td className="px-4 py-3 text-foreground">{p.weight ? `${p.weight} kg` : "—"}</td>
@@ -207,6 +221,15 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             <Sheet open={createOpen} onOpenChange={(open) => { if (!open) closeSheet(); }}>

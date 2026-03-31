@@ -49,8 +49,9 @@ export function LocationScheduleManager({ userRole }: { userRole: string }) {
     const [holidayDate, setHolidayDate] = useState("");
 
     useEffect(() => {
-        getLocations()
-            .then((locs) => {
+        getLocations({ limit: 0 })
+            .then((result) => {
+                const locs = result.data;
                 setLocationsState(locs);
                 if (locs.length > 0) setSelectedLocationId(locs[0].id);
             })

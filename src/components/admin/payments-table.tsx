@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, DollarSign } from "lucide-react";
+import { Pencil, Trash2, Plus, DollarSign, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -55,7 +58,6 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
     const [payments, setPayments] = useState<Payment[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
     const [memberSubscriptions, setMemberSubscriptions] = useState<Subscription[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editPayment, setEditPayment] = useState<Payment | null>(null);
@@ -65,22 +67,16 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadPayments = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getPayments();
-            setPayments(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading payments");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const table = useServerTable<Payment>({
+        fetchFn: getPayments,
+        pageSize: 10,
+        defaultSort: "paidAt",
+        defaultOrder: "desc",
+    });
 
     useEffect(() => {
-        loadPayments();
-        getMembers().then(setMembers);
-    }, [loadPayments]);
+        getMembers({ limit: 0 }).then((r) => setMembers(r.data));
+    }, []);
 
     // Load subscriptions when member changes in form
     useEffect(() => {
@@ -130,9 +126,9 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
                 ...(form.notes ? { notes: form.notes } : {}),
             };
             const created = await createPayment(payload);
-            setPayments((prev) => [created, ...prev]);
             toast.success(t("createSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Error");
         } finally {
@@ -150,9 +146,9 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
             if (form.notes !== (editPayment.notes ?? "")) payload.notes = form.notes || undefined;
 
             const updated = await updatePayment(editPayment.id, payload);
-            setPayments((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
             toast.success(t("updateSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Error");
         } finally {
@@ -165,9 +161,9 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         try {
             await deletePayment(deleteTarget.id);
-            setPayments((prev) => prev.filter((p) => p.id !== deleteTarget.id));
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
+            table.refetch();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Error");
         } finally {
@@ -186,17 +182,28 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm(emptyForm);
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("addPayment")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setForm(emptyForm);
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("addPayment")}
+                    </Button>
+                </div>
             </div>
 
             {/* Table */}
@@ -204,17 +211,17 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("member")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("subscription")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("amount")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("method")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("status")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("date")}</th>
+                            <SortableHeader label={t("member")} sortKey="member.lastName" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("subscription")} sortKey="subscription.plan.name" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("amount")} sortKey="amount" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("method")} sortKey="method" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("status")} sortKey="status" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("date")} sortKey="paidAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -226,15 +233,15 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : payments.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-16 text-center">
                                     <DollarSign className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-                                    <p className="text-sm font-medium text-muted-foreground">{t("noPayments")}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{table.search ? t("noResults") : t("noPayments")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            payments.map((payment) => (
+                            table.items.map((payment) => (
                                 <tr
                                     key={payment.id}
                                     className="group table-row-hover border-b border-border last:border-0"
@@ -283,6 +290,15 @@ export function PaymentsTable({ userRole }: { userRole: string }) {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* Create / Edit Sheet */}

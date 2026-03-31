@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, MapPin } from "lucide-react";
+import { Pencil, Trash2, Plus, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -31,8 +34,11 @@ const emptyForm: FormState = { name: "", address: "" };
 export function LocationsTable() {
     const t = useTranslations("locations_admin");
 
-    const [locations, setLocations] = useState<Location[]>([]);
-    const [loading, setLoading] = useState(true);
+    const table = useServerTable<Location>({
+        fetchFn: getLocations,
+        pageSize: 10,
+        defaultSort: "createdAt",
+    });
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editLocation, setEditLocation] = useState<Location | null>(null);
@@ -41,22 +47,6 @@ export function LocationsTable() {
     const [form, setForm] = useState<FormState>(emptyForm);
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
-
-    const loadLocations = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getLocations();
-            setLocations(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading locations");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadLocations();
-    }, [loadLocations]);
 
     const openEdit = (loc: Location) => {
         setEditLocation(loc);
@@ -83,7 +73,7 @@ export function LocationsTable() {
                 name: form.name.trim(),
                 address: form.address.trim() || undefined,
             });
-            setLocations((prev) => [...prev, created]);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -104,7 +94,7 @@ export function LocationsTable() {
                 payload.address = form.address.trim() || undefined;
             }
             const updated = await updateLocation(editLocation.id, payload);
-            setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -119,7 +109,7 @@ export function LocationsTable() {
         setSubmitting(true);
         try {
             await deleteLocation(deleteTarget.id);
-            setLocations((prev) => prev.filter((l) => l.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -140,17 +130,28 @@ export function LocationsTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm(emptyForm);
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("addLocation")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setForm(emptyForm);
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("addLocation")}
+                    </Button>
+                </div>
             </div>
 
             {/* ── Table ───────────────────────────────────────────────────── */}
@@ -158,14 +159,14 @@ export function LocationsTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("name")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("address")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden xl:table-cell">{t("createdAt")}</th>
+                            <SortableHeader label={t("name")} sortKey="name" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("address")} sortKey="address" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("createdAt")} sortKey="createdAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden xl:table-cell" />
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 4 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -174,7 +175,7 @@ export function LocationsTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : locations.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="px-4 py-16 text-center">
                                     <MapPin className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -182,7 +183,7 @@ export function LocationsTable() {
                                 </td>
                             </tr>
                         ) : (
-                            locations.map((loc) => (
+                            table.items.map((loc) => (
                                 <tr key={loc.id} className="group table-row-hover border-b border-border last:border-0">
                                     <td className="px-4 py-3 font-medium text-foreground">{loc.name}</td>
                                     <td className="px-4 py-3 text-muted-foreground hidden md:table-cell">
@@ -211,6 +212,15 @@ export function LocationsTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* ── Create / Edit Sheet ─────────────────────────────────────── */}

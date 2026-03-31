@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, ShieldCheck, ChevronDown, ChevronRight } from "lucide-react";
+import { Pencil, Trash2, Plus, ShieldCheck, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { Badge } from "@/components/ui/badge";
 import {
     Sheet,
@@ -42,8 +45,11 @@ const emptyForm: FormState = { name: "", description: "" };
 export function RolesTable() {
     const t = useTranslations("roles");
 
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [loading, setLoading] = useState(true);
+    const table = useServerTable<Role>({
+        fetchFn: getRoles,
+        pageSize: 10,
+        defaultSort: "name",
+    });
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editRole, setEditRole] = useState<Role | null>(null);
@@ -58,21 +64,7 @@ export function RolesTable() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadRoles = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getRoles();
-            setRoles(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading roles");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
 
-    useEffect(() => {
-        loadRoles();
-    }, [loadRoles]);
 
     const openEdit = (role: Role) => {
         setEditRole(role);
@@ -99,7 +91,7 @@ export function RolesTable() {
                 name: form.name.trim(),
                 description: form.description.trim() || undefined,
             });
-            setRoles((prev) => [...prev, created]);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -120,7 +112,7 @@ export function RolesTable() {
                 payload.description = form.description.trim() || undefined;
             }
             const updated = await updateRole(editRole.id, payload);
-            setRoles((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -135,7 +127,7 @@ export function RolesTable() {
         setSubmitting(true);
         try {
             await deleteRole(deleteTarget.id);
-            setRoles((prev) => prev.filter((r) => r.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -194,17 +186,28 @@ export function RolesTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm(emptyForm);
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("addRole")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setForm(emptyForm);
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("addRole")}
+                    </Button>
+                </div>
             </div>
 
             {/* ── Table ───────────────────────────────────────────────────── */}
@@ -212,14 +215,14 @@ export function RolesTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("name")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("description")}</th>
+                            <SortableHeader label={t("name")} sortKey="name" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("description")} sortKey="description" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("users")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 4 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-5 w-20 rounded-full skeleton-shimmer" /></td>
@@ -228,15 +231,17 @@ export function RolesTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : roles.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="px-4 py-16 text-center">
                                     <ShieldCheck className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-                                    <p className="text-sm font-medium text-muted-foreground">{t("noRoles")}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        {table.search ? t("noSearchResults") : t("noRoles")}
+                                    </p>
                                 </td>
                             </tr>
                         ) : (
-                            roles.map((role) => (
+                            table.items.map((role) => (
                                 <tr key={role.id} className="group table-row-hover border-b border-border last:border-0">
                                     <td className="px-4 py-3">
                                         <Badge variant="secondary" className="font-mono text-xs">{role.name}</Badge>
@@ -276,6 +281,15 @@ export function RolesTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* ── Create / Edit Sheet ─────────────────────────────────────── */}

@@ -22,10 +22,12 @@ export function TrainerDashboardContent({ userId }: { userId: string }) {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const [classes, workouts] = await Promise.all([
-                getGroupClasses(),
-                getWorkouts(),
+            const [classesResult, workoutsResult] = await Promise.all([
+                getGroupClasses({ limit: 0 }),
+                getWorkouts({ limit: 0 }),
             ]);
+            const classes = classesResult.data;
+            const workouts = workoutsResult.data;
 
             const now = new Date();
             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());

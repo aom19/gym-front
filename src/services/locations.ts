@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface Location {
     id: string;
@@ -31,9 +32,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getLocations(): Promise<Location[]> {
+export async function getLocations(params?: PaginationParams): Promise<PaginatedResult<Location>> {
     try {
-        const { data } = await api.get<Location[]>("/locations", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<Location>>("/locations", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

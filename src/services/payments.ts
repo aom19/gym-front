@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface PaymentMember {
     id: string;
@@ -56,9 +57,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getPayments(): Promise<Payment[]> {
+export async function getPayments(params?: PaginationParams): Promise<PaginatedResult<Payment>> {
     try {
-        const { data } = await api.get<Payment[]>("/payments", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<Payment>>("/payments", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

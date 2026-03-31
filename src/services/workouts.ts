@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
 import type { MuscleGroup } from "./exercises";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface WorkoutExerciseItem {
     id: string;
@@ -79,9 +80,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getWorkouts(): Promise<Workout[]> {
+export async function getWorkouts(params?: PaginationParams): Promise<PaginatedResult<Workout>> {
     try {
-        const { data } = await api.get<Workout[]>("/workouts", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<Workout>>("/workouts", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

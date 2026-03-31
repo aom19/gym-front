@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, ShieldCheck, ShieldOff, UserCog } from "lucide-react";
+import { Pencil, Trash2, Plus, ShieldCheck, ShieldOff, UserCog, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -21,23 +24,10 @@ import {
     deleteUser,
     getLocations,
     type User,
+    getRoles,
     type UserLocation,
     type UserRole,
 } from "@/services/users";
-import { api } from "@/services/api";
-
-// Fetches all roles from the API (simple helper, not exported from users.ts to avoid import confusion)
-async function fetchRolesFromApi(): Promise<UserRole[]> {
-    try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-        const { data } = await api.get<UserRole[]>("/roles", {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        return data;
-    } catch {
-        return [];
-    }
-}
 
 interface FormState {
     email: string;
@@ -51,10 +41,8 @@ const emptyForm: FormState = { email: "", password: "", roleId: "", locationId: 
 export function UsersTable() {
     const t = useTranslations("users");
 
-    const [users, setUsers] = useState<User[]>([]);
     const [roles, setRoles] = useState<UserRole[]>([]);
     const [locations, setLocations] = useState<UserLocation[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editUser, setEditUser] = useState<User | null>(null);
@@ -64,23 +52,17 @@ export function UsersTable() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadUsers = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getUsers();
-            setUsers(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t("errors.generic"));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
+    const table = useServerTable<User>({
+        fetchFn: getUsers,
+        pageSize: 10,
+        defaultSort: "createdAt",
+        defaultOrder: "desc",
+    });
 
     useEffect(() => {
-        loadUsers();
-        fetchRolesFromApi().then(setRoles);
+        getRoles().then(setRoles);
         getLocations().then(setLocations);
-    }, [loadUsers]);
+    }, []);
 
     // ── Open edit sheet ──────────────────────────────────────────────────────
     const openEdit = (user: User) => {
@@ -116,9 +98,9 @@ export function UsersTable() {
                 roleId: form.roleId,
                 locationId: form.locationId,
             });
-            setUsers((prev) => [created, ...prev]);
             toast.success(t("createSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : t("errors.generic"));
         } finally {
@@ -139,9 +121,9 @@ export function UsersTable() {
             if (form.locationId !== editUser.location.id) payload.locationId = form.locationId;
 
             const updated = await updateUser(editUser.id, payload);
-            setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
             toast.success(t("updateSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : t("errors.generic"));
         } finally {
@@ -155,9 +137,9 @@ export function UsersTable() {
         setSubmitting(true);
         try {
             await deleteUser(deleteTarget.id);
-            setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
+            table.refetch();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : t("errors.generic"));
         } finally {
@@ -176,17 +158,28 @@ export function UsersTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm(emptyForm);
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("addUser")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setForm(emptyForm);
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("addUser")}
+                    </Button>
+                </div>
             </div>
 
             {/* ── Table ─────────────────────────────────────────────────────── */}
@@ -194,15 +187,15 @@ export function UsersTable() {
                 <table className="w-full text-sm">
                     <thead className="border border-border/50 bg-red">
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("email")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("role")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t("location")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden xl:table-cell">{t("createdAt")}</th>
+                            <SortableHeader label={t("email")} sortKey="email" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("role")} sortKey="role.name" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("location")} sortKey="location.name" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
+                            <SortableHeader label={t("createdAt")} sortKey="createdAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden xl:table-cell" />
                             <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-40 rounded-md skeleton-shimmer" /></td>
@@ -212,15 +205,15 @@ export function UsersTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : users.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-4 py-16 text-center">
                                     <UserCog className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-                                    <p className="text-sm font-medium text-muted-foreground">{t("noUsers")}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{table.search ? t("noResults") : t("noUsers")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            users.map((user) => (
+                            table.items.map((user) => (
                                 <tr
                                     key={user.id}
                                     className="group table-row-hover border-b border-border last:border-0"
@@ -280,6 +273,15 @@ export function UsersTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* ── Create / Edit Sheet ───────────────────────────────────────── */}

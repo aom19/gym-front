@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface UserRole {
     id: string;
@@ -47,9 +48,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getUsers(): Promise<User[]> {
+export async function getUsers(params?: PaginationParams): Promise<PaginatedResult<User>> {
     try {
-        const { data } = await api.get<User[]>("/users", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<User>>("/users", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);
@@ -93,8 +94,8 @@ export async function deleteUser(id: string): Promise<void> {
 
 export async function getRoles(): Promise<UserRole[]> {
     try {
-        const { data } = await api.get<UserRole[]>("/roles", { headers: getAuthHeaders() });
-        return data;
+        const { data } = await api.get<{ data: UserRole[] }>("/roles", { headers: getAuthHeaders(), params: { limit: 0 } });
+        return data.data;
     } catch {
         return [];
     }
@@ -102,8 +103,8 @@ export async function getRoles(): Promise<UserRole[]> {
 
 export async function getLocations(): Promise<UserLocation[]> {
     try {
-        const { data } = await api.get<UserLocation[]>("/locations", { headers: getAuthHeaders() });
-        return data;
+        const { data } = await api.get<{ data: UserLocation[] }>("/locations", { headers: getAuthHeaders(), params: { limit: 0 } });
+        return data.data;
     } catch {
         return [];
     }

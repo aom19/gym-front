@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, Users, CreditCard } from "lucide-react";
+import { Pencil, Trash2, Plus, Users, CreditCard, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,9 @@ import {
 } from "@/services/members";
 import { getLocations, type UserLocation } from "@/services/users";
 import { MemberSubscriptions } from "@/components/admin/member-subscriptions";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 interface FormState {
     firstName: string;
@@ -51,9 +54,7 @@ function getMemberActiveSub(member: Member) {
 export function MembersTable({ userRole }: { userRole: string }) {
     const t = useTranslations("members");
 
-    const [members, setMembers] = useState<Member[]>([]);
     const [locations, setLocations] = useState<UserLocation[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editMember, setEditMember] = useState<Member | null>(null);
@@ -64,22 +65,15 @@ export function MembersTable({ userRole }: { userRole: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadMembers = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getMembers();
-            setMembers(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading members");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const table = useServerTable<Member>({
+        fetchFn: getMembers,
+        pageSize: 10,
+        defaultSort: "lastName",
+    });
 
     useEffect(() => {
-        loadMembers();
         getLocations().then(setLocations);
-    }, [loadMembers]);
+    }, []);
 
     // ── Open edit sheet ──────────────────────────────────────────────────────
     const openEdit = (member: Member) => {
@@ -120,9 +114,9 @@ export function MembersTable({ userRole }: { userRole: string }) {
                 ...(form.dateOfBirth ? { dateOfBirth: form.dateOfBirth } : {}),
             };
             const created = await createMember(payload);
-            setMembers((prev) => [created, ...prev]);
             toast.success(t("createSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Error");
         } finally {
@@ -147,9 +141,9 @@ export function MembersTable({ userRole }: { userRole: string }) {
             if (newDob !== oldDob) payload.dateOfBirth = newDob;
 
             const updated = await updateMember(editMember.id, payload);
-            setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
             toast.success(t("updateSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Error");
         } finally {
@@ -163,9 +157,9 @@ export function MembersTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         try {
             await deleteMember(deleteTarget.id);
-            setMembers((prev) => prev.filter((m) => m.id !== deleteTarget.id));
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
+            table.refetch();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Error");
         } finally {
@@ -184,7 +178,17 @@ export function MembersTable({ userRole }: { userRole: string }) {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button
                     onClick={() => {
                         setForm(emptyForm);
                         setFormError(null);
@@ -195,6 +199,7 @@ export function MembersTable({ userRole }: { userRole: string }) {
                     <Plus className="size-4" />
                     {t("addMember")}
                 </Button>
+                </div>
             </div>
 
             {/* ── Table ─────────────────────────────────────────────────────── */}
@@ -202,16 +207,16 @@ export function MembersTable({ userRole }: { userRole: string }) {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("name")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("email")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("phone")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("location")}</th>
+                            <SortableHeader label={t("name")} sortKey="lastName" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("email")} sortKey="email" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("phone")} sortKey="phone" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("location")} sortKey="location.name" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("status")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -222,15 +227,15 @@ export function MembersTable({ userRole }: { userRole: string }) {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : members.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-4 py-16 text-center">
                                     <Users className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-                                    <p className="text-sm font-medium text-muted-foreground">{t("noMembers")}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{table.search ? t("noResults") : t("noMembers")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            members.map((member) => {
+                            table.items.map((member) => {
                                 const sub = getMemberActiveSub(member);
                                 const isActive = !!sub;
                                 return (
@@ -302,6 +307,15 @@ export function MembersTable({ userRole }: { userRole: string }) {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* ── Create / Edit Sheet ───────────────────────────────────────── */}
@@ -420,7 +434,7 @@ export function MembersTable({ userRole }: { userRole: string }) {
                     memberId={subsMember.id}
                     memberName={`${subsMember.firstName} ${subsMember.lastName}`}
                     open={!!subsMember}
-                    onClose={() => { setSubsMember(null); loadMembers(); }}
+                    onClose={() => { setSubsMember(null); table.refetch(); }}
                 />
             )}
         </>

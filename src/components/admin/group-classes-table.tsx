@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, Calendar, Users } from "lucide-react";
+import { Pencil, Trash2, Plus, Calendar, Users, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -47,10 +50,14 @@ const emptyForm: FormState = {
 export function GroupClassesTable({ userRole }: { userRole: string }) {
     const t = useTranslations("groupClasses");
 
-    const [classes, setClasses] = useState<GroupClass[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [instructors, setInstructors] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    const table = useServerTable<GroupClass>({
+        fetchFn: getGroupClasses,
+        pageSize: 10,
+        defaultSort: "scheduledAt",
+    });
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editClass, setEditClass] = useState<GroupClass | null>(null);
@@ -64,23 +71,10 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadClasses = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getGroupClasses();
-            setClasses(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t("errors.generic"));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
-
     useEffect(() => {
-        loadClasses();
-        getLocations().then(setLocations).catch(() => {});
-        getUsers().then((users) => setInstructors(users.filter((u) => u.role.name === "TRAINER" || u.role.name === "ADMIN"))).catch(() => {});
-    }, [loadClasses]);
+        getLocations({ limit: 0 }).then((r) => setLocations(r.data)).catch(() => {});
+        getUsers({ limit: 0 }).then((r) => setInstructors(r.data.filter((u) => u.role.name === "TRAINER" || u.role.name === "ADMIN"))).catch(() => {});
+    }, []);
 
     const openEdit = (c: GroupClass) => {
         setEditClass(c);
@@ -125,7 +119,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         setFormError(null);
         try {
-            const created = await createGroupClass({
+            await createGroupClass({
                 title: form.title,
                 type: form.type as ClassType,
                 locationId: form.locationId,
@@ -135,7 +129,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                 isActive: form.isActive,
                 ...(form.instructorId ? { instructorId: form.instructorId } : {}),
             });
-            setClasses((prev) => [created, ...prev]);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -150,7 +144,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         setFormError(null);
         try {
-            const updated = await updateGroupClass(editClass.id, {
+            await updateGroupClass(editClass.id, {
                 title: form.title,
                 type: form.type as ClassType,
                 locationId: form.locationId,
@@ -160,7 +154,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                 isActive: form.isActive,
                 ...(form.instructorId ? { instructorId: form.instructorId } : {}),
             });
-            setClasses((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -175,7 +169,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         try {
             await deleteGroupClass(deleteTarget.id);
-            setClasses((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -195,26 +189,37 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button onClick={() => { setForm(emptyForm); setFormError(null); setCreateOpen(true); }} className="gap-1.5">
-                    <Plus className="size-4" /> {t("addClass")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button onClick={() => { setForm(emptyForm); setFormError(null); setCreateOpen(true); }} className="gap-1.5">
+                        <Plus className="size-4" /> {t("addClass")}
+                    </Button>
+                </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("classTitle")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">{t("type")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("location")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("scheduledAt")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t("participants")}</th>
+                            <SortableHeader label={t("classTitle")} sortKey="title" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("type")} sortKey="type" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("location")} sortKey="location" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("scheduledAt")} sortKey="scheduledAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("participants")} sortKey="maxParticipants" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t("status")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -226,7 +231,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : classes.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-16 text-center">
                                     <Calendar className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -234,7 +239,7 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                                 </td>
                             </tr>
                         ) : (
-                            classes.map((c) => (
+                            table.items.map((c) => (
                                 <tr key={c.id} className="group table-row-hover border-b border-border last:border-0">
                                     <td className="px-4 py-3"><span className="font-medium text-foreground">{c.title}</span></td>
                                     <td className="px-4 py-3 hidden sm:table-cell"><Badge variant="secondary">{c.type}</Badge></td>
@@ -261,6 +266,15 @@ export function GroupClassesTable({ userRole }: { userRole: string }) {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* Create/Edit Sheet */}

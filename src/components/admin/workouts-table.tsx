@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, ClipboardList, ChevronDown, ChevronUp } from "lucide-react";
+import { Pencil, Trash2, Plus, ClipboardList, ChevronDown, ChevronUp, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -43,11 +46,15 @@ const emptyForm: FormState = { title: "", date: "", trainerId: "", memberId: "",
 export function WorkoutsTable({ userRole }: { userRole: string }) {
     const t = useTranslations("workouts");
 
-    const [workouts, setWorkouts] = useState<Workout[]>([]);
+    const table = useServerTable<Workout>({
+        fetchFn: getWorkouts,
+        pageSize: 10,
+        defaultSort: "date",
+    });
+
     const [exercisesList, setExercisesList] = useState<Exercise[]>([]);
     const [membersList, setMembersList] = useState<Member[]>([]);
     const [trainersList, setTrainersList] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const [createOpen, setCreateOpen] = useState(false);
@@ -58,24 +65,11 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadWorkouts = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getWorkouts();
-            setWorkouts(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : t("errors.generic"));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
-
     useEffect(() => {
-        loadWorkouts();
-        getExercises().then(setExercisesList).catch(() => {});
-        getMembers().then(setMembersList).catch(() => {});
-        getUsers().then((users) => setTrainersList(users.filter((u) => u.role.name === "TRAINER" || u.role.name === "ADMIN"))).catch(() => {});
-    }, [loadWorkouts]);
+        getExercises({ limit: 0 }).then(r => setExercisesList(r.data)).catch(() => {});
+        getMembers({ limit: 0 }).then(r => setMembersList(r.data)).catch(() => {});
+        getUsers({ limit: 0 }).then((r) => setTrainersList(r.data.filter((u) => u.role.name === "TRAINER" || u.role.name === "ADMIN"))).catch(() => {});
+    }, []);
 
     const openEdit = (w: Workout) => {
         setEditWorkout(w);
@@ -128,7 +122,7 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                 ...(form.notes ? { notes: form.notes } : {}),
                 exercises: buildPayloadExercises(),
             });
-            setWorkouts((prev) => [created, ...prev]);
+            table.refetch();
             toast.success(t("createSuccess"));
             closeSheet();
         } catch (err) {
@@ -151,7 +145,7 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                 notes: form.notes || undefined,
                 exercises: buildPayloadExercises(),
             });
-            setWorkouts((prev) => prev.map((w) => (w.id === updated.id ? updated : w)));
+            table.refetch();
             toast.success(t("updateSuccess"));
             closeSheet();
         } catch (err) {
@@ -166,7 +160,7 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
         setSubmitting(true);
         try {
             await deleteWorkout(deleteTarget.id);
-            setWorkouts((prev) => prev.filter((w) => w.id !== deleteTarget.id));
+            table.refetch();
             toast.success(t("deleteSuccess"));
             setDeleteTarget(null);
         } catch (err) {
@@ -190,9 +184,20 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button onClick={() => { setForm(emptyForm); setFormError(null); setCreateOpen(true); }} className="gap-1.5">
-                    <Plus className="size-4" /> {t("addWorkout")}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
+                    <Button onClick={() => { setForm(emptyForm); setFormError(null); setCreateOpen(true); }} className="gap-1.5">
+                        <Plus className="size-4" /> {t("addWorkout")}
+                    </Button>
+                </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -200,16 +205,16 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
                             <th className="w-8 px-2"></th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("titleCol")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">{t("date")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t("member")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t("trainer")}</th>
+                            <SortableHeader label={t("titleCol")} sortKey="title" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("date")} sortKey="date" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("member")} sortKey="member" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
+                            <SortableHeader label={t("trainer")} sortKey="trainer" currentSort={table.sort} onToggle={table.toggleSort} className="hidden lg:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t("exercisesCol")}</th>
                             <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-2 py-3"><div className="size-4 rounded skeleton-shimmer" /></td>
@@ -221,7 +226,7 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : workouts.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="px-4 py-16 text-center">
                                     <ClipboardList className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -229,9 +234,9 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                                 </td>
                             </tr>
                         ) : (
-                            workouts.map((w) => (
-                                <>
-                                    <tr key={w.id} className="group table-row-hover border-b border-border last:border-0">
+                            table.items.map((w) => (
+                                <Fragment key={w.id}>
+                                    <tr className="group table-row-hover border-b border-border last:border-0">
                                         <td className="px-2 py-3">
                                             <Button variant="ghost" size="icon-sm" onClick={() => setExpandedId(expandedId === w.id ? null : w.id)}>
                                                 {expandedId === w.id ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
@@ -254,7 +259,7 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                                         </td>
                                     </tr>
                                     {expandedId === w.id && w.exercises.length > 0 && (
-                                        <tr key={`${w.id}-exp`} className="bg-muted/20">
+                                        <tr className="bg-muted/20">
                                             <td colSpan={7} className="px-8 py-3">
                                                 <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-6 gap-y-1 text-xs">
                                                     <span className="font-semibold text-muted-foreground uppercase">{t("exercise")}</span>
@@ -262,22 +267,31 @@ export function WorkoutsTable({ userRole }: { userRole: string }) {
                                                     <span className="font-semibold text-muted-foreground uppercase">{t("reps")}</span>
                                                     <span className="font-semibold text-muted-foreground uppercase">{t("weight")}</span>
                                                     {w.exercises.sort((a, b) => a.order - b.order).map((ex) => (
-                                                        <>
-                                                            <span key={`${ex.id}-n`} className="text-foreground">{ex.exercise.name}</span>
-                                                            <span key={`${ex.id}-s`} className="text-muted-foreground">{ex.sets}</span>
-                                                            <span key={`${ex.id}-r`} className="text-muted-foreground">{ex.reps}</span>
-                                                            <span key={`${ex.id}-w`} className="text-muted-foreground">{ex.weight ?? "—"}</span>
-                                                        </>
+                                                        <Fragment key={ex.id}>
+                                                            <span className="text-foreground">{ex.exercise.name}</span>
+                                                            <span className="text-muted-foreground">{ex.sets}</span>
+                                                            <span className="text-muted-foreground">{ex.reps}</span>
+                                                            <span className="text-muted-foreground">{ex.weight ?? "—"}</span>
+                                                        </Fragment>
                                                     ))}
                                                 </div>
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </Fragment>
                             ))
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             <Sheet open={isSheetOpen} onOpenChange={(open) => { if (!open) closeSheet(); }}>

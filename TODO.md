@@ -180,4 +180,4 @@
 - [ ] Gestionare token refresh automat în `src/services/api.ts` (interceptor axios)
 - [ ] Stare globală user în zustand (sync cu cookie)
 - [ ] Pagini de eroare personalizate (404, 500)
-- [ ] PWA manifest pentru instalare pe tabletă (recepție)
+

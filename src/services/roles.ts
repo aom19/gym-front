@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface Role {
     id: string;
@@ -39,9 +40,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getRoles(): Promise<Role[]> {
+export async function getRoles(params?: PaginationParams): Promise<PaginatedResult<Role>> {
     try {
-        const { data } = await api.get<Role[]>("/roles", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<Role>>("/roles", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

@@ -109,7 +109,9 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Șterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută membri…",
+        "noResults": "Niciun membru nu corespunde căutării"
     },
     "users": {
         "title": "Utilizatori",
@@ -141,7 +143,8 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Șterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută utilizatori…"
     },
     "subscriptions": {
         "title": "Planuri de Abonament",
@@ -180,7 +183,8 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Șterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută planuri…"
     },
     "checkins": {
         "title": "Check-in-uri",
@@ -189,6 +193,7 @@
         "time": "Check-in",
         "checkout": "Check-out",
         "location": "Locație",
+        "actions": "Acțiuni",
         "checkedInBy": "Înregistrat de",
         "noCheckins": "Niciun check-in azi",
         "todayCheckins": "Check-in-uri de Azi",
@@ -205,7 +210,9 @@
         "filterByLocation": "Toate Locațiile",
         "cancel": "Anulează",
         "save": "Salvează",
-        "saving": "Se salvează…"
+        "saving": "Se salvează…",
+        "search": "Caută check-in-uri…",
+        "noResults": "Niciun check-in nu corespunde căutării"
     },
     "payments": {
         "title": "Plăți",
@@ -248,7 +255,9 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Șterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută plăți…",
+        "noResults": "Nicio plată nu corespunde căutării"
     },
     "home": {
         "heroTitle": "Modalitatea mai inteligentă de a-ți gestiona sala",
@@ -346,7 +355,8 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Sterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută locații…"
     },
     "roles": {
         "title": "Roluri & Permisiuni",
@@ -378,7 +388,8 @@
         "save": "Salvează",
         "saving": "Se salvează…",
         "delete": "Sterge",
-        "deleting": "Se șterge…"
+        "deleting": "Se șterge…",
+        "search": "Caută roluri…"
     },
     "exercises": {
         "title": "Exerciții",
@@ -411,7 +422,8 @@
         "deleting": "Se șterge…",
         "errors": {
             "generic": "A apărut o eroare"
-        }
+        },
+        "search": "Caută exerciții…"
     },
     "workouts": {
         "title": "Antrenamente",
@@ -452,7 +464,8 @@
         "deleting": "Se șterge…",
         "errors": {
             "generic": "A apărut o eroare"
-        }
+        },
+        "search": "Caută antrenamente…"
     },
     "groupClasses": {
         "title": "Cursuri de grup",
@@ -495,7 +508,8 @@
         "deleting": "Se șterge…",
         "errors": {
             "generic": "A apărut o eroare"
-        }
+        },
+        "search": "Caută clase…"
     },
     "locationSchedule": {
         "title": "Program locații",
@@ -545,7 +559,8 @@
             "generic": "A apărut o eroare"
         },
         "weightTrend": "Evoluție greutate",
-        "bodyFatTrend": "Evoluție grăsime corporală"
+        "bodyFatTrend": "Evoluție grăsime corporală",
+        "search": "Caută înregistrări…"
     },
     "checkinsHistory": {
         "title": "Istoric Check-in-uri",
@@ -566,7 +581,8 @@
         "results": "rezultate",
         "min": "min",
         "inProgress": "În desfășurare",
-        "exportCSV": "Export CSV"
+        "exportCSV": "Export CSV",
+        "search": "Caută check-in-uri…"
     },
     "memberSubscriptions": {
         "title": "Abonamente",
@@ -667,5 +683,17 @@
         "members": "Membri",
         "subscriptions": "Abonamente",
         "noData": "Nu sunt date disponibile"
+    },
+    "table": {
+        "showing": "Se afișează {from}–{to} din {total}",
+        "firstPage": "Prima pagină",
+        "previousPage": "Pagina anterioară",
+        "nextPage": "Pagina următoare",
+        "lastPage": "Ultima pagină"
+    },
+    "notFound": {
+        "title": "Pagina nu a fost găsită",
+        "description": "Pagina pe care o cauți nu există sau a fost mutată.",
+        "goHome": "Acasă"
     }
 }

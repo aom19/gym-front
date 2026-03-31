@@ -48,14 +48,14 @@ export function MemberSubscriptions({ memberId, memberName, open, onClose }: Pro
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const [subs, st, allPlans] = await Promise.all([
+            const [subs, st, plansResult] = await Promise.all([
                 getSubscriptionsByMember(memberId),
                 getSubscriptionStatus(memberId),
-                getSubscriptionPlans(),
+                getSubscriptionPlans({ limit: 0 }),
             ]);
             setSubscriptions(subs);
             setStatus(st);
-            setPlans(allPlans.filter((p) => p.isActive));
+            setPlans(plansResult.data.filter((p) => p.isActive));
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Error loading subscriptions");
         } finally {

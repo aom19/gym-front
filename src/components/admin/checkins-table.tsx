@@ -3,11 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { LogIn, LogOut, Plus, CheckSquare, History } from "lucide-react";
+import { LogIn, LogOut, Plus, CheckSquare, History, Search } from "lucide-react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { useServerTable } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     Sheet,
     SheetContent,
@@ -32,7 +36,6 @@ export function CheckinsTable() {
     const [checkins, setCheckins] = useState<Checkin[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
     const [locations, setLocations] = useState<UserLocation[]>([]);
-    const [loading, setLoading] = useState(true);
     const [filterLocation, setFilterLocation] = useState("");
 
     const [createOpen, setCreateOpen] = useState(false);
@@ -40,24 +43,26 @@ export function CheckinsTable() {
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loadCheckins = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getTodayCheckins(filterLocation || undefined);
-            setCheckins(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading check-ins");
-        } finally {
-            setLoading(false);
-        }
+    const fetchTodayCheckins = useCallback(
+        (params: import("@/hooks/useServerTable").PaginationParams) =>
+            getTodayCheckins({ ...params, locationId: filterLocation || undefined }),
+        [filterLocation],
+    );
+
+    const table = useServerTable<Checkin>({
+        fetchFn: fetchTodayCheckins,
+        pageSize: 10,
+        defaultSort: "checkInAt",
+        defaultOrder: "desc",
+    });
+
+    // Reset page when location filter changes
+    useEffect(() => {
+        table.setPage(1);
     }, [filterLocation]);
 
     useEffect(() => {
-        loadCheckins();
-    }, [loadCheckins]);
-
-    useEffect(() => {
-        getMembers().then(setMembers);
+        getMembers({ limit: 0 }).then((r) => setMembers(r.data));
         getLocations().then(setLocations);
     }, []);
 
@@ -80,9 +85,9 @@ export function CheckinsTable() {
                 locationId: form.locationId,
             };
             const created = await createCheckin(payload);
-            setCheckins((prev) => [created, ...prev]);
             toast.success(t("checkInSuccess"));
             closeSheet();
+            table.refetch();
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "Error");
         } finally {
@@ -93,16 +98,16 @@ export function CheckinsTable() {
     const handleCheckout = async (id: string) => {
         try {
             const updated = await checkoutCheckin(id);
-            setCheckins((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
             toast.success(t("checkOutSuccess"));
+            table.refetch();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Error");
         }
     };
 
-    // Compute location counts
+    // Compute location counts from current page items
     const locationCounts: Record<string, number> = {};
-    for (const c of checkins) {
+    for (const c of table.items) {
         locationCounts[c.location.name] = (locationCounts[c.location.name] ?? 0) + 1;
     }
 
@@ -114,7 +119,16 @@ export function CheckinsTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={table.search}
+                            onChange={(e) => table.setSearch(e.target.value)}
+                            className="pl-8 w-48 h-9 text-sm"
+                        />
+                    </div>
                     <Button
                         onClick={() => {
                             setForm({ memberId: "", locationId: "" });
@@ -170,15 +184,15 @@ export function CheckinsTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("member")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("time")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("checkout")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("location")}</th>
+                            <SortableHeader label={t("member")} sortKey="member.lastName" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("time")} sortKey="checkInAt" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("checkout")} sortKey="checkOutAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("location")} sortKey="location.name" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
                             <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("actions")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -188,15 +202,15 @@ export function CheckinsTable() {
                                     <td className="px-4 py-3"><div className="h-4 w-14 ml-auto rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : checkins.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-4 py-16 text-center">
                                     <CheckSquare className="mx-auto mb-3 size-8 text-muted-foreground/40" />
-                                    <p className="text-sm font-medium text-muted-foreground">{t("noCheckins")}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{table.search ? t("noResults") : t("noCheckins")}</p>
                                 </td>
                             </tr>
                         ) : (
-                            checkins.map((checkin) => (
+                            table.items.map((checkin) => (
                                 <tr
                                     key={checkin.id}
                                     className="group table-row-hover border-b border-border last:border-0"
@@ -248,6 +262,15 @@ export function CheckinsTable() {
                         )}
                     </tbody>
                 </table>
+                {!table.loading && table.items.length > 0 && (
+                    <TablePagination
+                        page={table.page}
+                        totalPages={table.totalPages}
+                        totalItems={table.totalItems}
+                        pageSize={table.pageSize}
+                        onPageChange={table.setPage}
+                    />
+                )}
             </div>
 
             {/* Check-in Sheet */}

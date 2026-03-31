@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export interface CheckinMember {
     id: string;
@@ -48,9 +49,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getCheckins(): Promise<Checkin[]> {
+export async function getCheckins(params?: PaginationParams & { locationId?: string; dateFrom?: string; dateTo?: string }): Promise<PaginatedResult<Checkin>> {
     try {
-        const { data } = await api.get<Checkin[]>("/checkins", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<Checkin>>("/checkins", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);
@@ -66,10 +67,9 @@ export async function getCheckinsByMember(memberId: string): Promise<Checkin[]> 
     }
 }
 
-export async function getTodayCheckins(locationId?: string): Promise<Checkin[]> {
+export async function getTodayCheckins(params?: PaginationParams & { locationId?: string }): Promise<PaginatedResult<Checkin>> {
     try {
-        const params = locationId ? { locationId } : {};
-        const { data } = await api.get<Checkin[]>("/checkins/today", { headers: getAuthHeaders(), params });
+        const { data } = await api.get<PaginatedResult<Checkin>>("/checkins/today", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

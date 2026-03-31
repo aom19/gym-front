@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export type MuscleGroup =
     | "CHEST" | "BACK" | "SHOULDERS" | "BICEPS" | "TRICEPS"
@@ -49,10 +50,9 @@ function handleError(error: unknown): never {
     throw new Error(Array.isArray(raw) ? raw.join(", ") : String(raw));
 }
 
-export async function getExercises(muscleGroup?: MuscleGroup): Promise<Exercise[]> {
+export async function getExercises(params?: PaginationParams & { muscleGroup?: MuscleGroup }): Promise<PaginatedResult<Exercise>> {
     try {
-        const params = muscleGroup ? { muscleGroup } : {};
-        const { data } = await api.get<Exercise[]>("/exercises", { headers: getAuthHeaders(), params });
+        const { data } = await api.get<PaginatedResult<Exercise>>("/exercises", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);

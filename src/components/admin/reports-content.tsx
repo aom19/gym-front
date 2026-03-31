@@ -91,18 +91,18 @@ export function ReportsContent() {
     const loadData = useCallback(async () => {
         setLoading(true);
         try {
-            const [m, p, c, sp, gc] = await Promise.all([
-                getMembers(),
-                getPayments(),
-                getCheckins(),
-                getSubscriptionPlans(),
-                getGroupClasses(),
+            const [mR, pR, cR, spR, gcR] = await Promise.all([
+                getMembers({ limit: 0 }),
+                getPayments({ limit: 0 }),
+                getCheckins({ limit: 0 }),
+                getSubscriptionPlans({ limit: 0 }),
+                getGroupClasses({ limit: 0 }),
             ]);
-            setMembers(m);
-            setPayments(p);
-            setCheckins(c);
-            setPlans(sp);
-            setClasses(gc);
+            setMembers(mR.data);
+            setPayments(pR.data);
+            setCheckins(cR.data);
+            setPlans(spR.data);
+            setClasses(gcR.data);
         } catch (err) {
             toast.error(err instanceof Error ? err.message : t("loadError"));
         } finally {

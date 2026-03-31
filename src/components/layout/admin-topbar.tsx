@@ -104,6 +104,10 @@ export function AdminTopbar() {
     .split("/")
     .filter(Boolean);
 
+  // Convert URL segments like "trainer-dashboard" to camelCase "trainerDashboard" for translation lookup
+  const toCamelCase = (s: string) =>
+    s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+
   const currentLang = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
 
   return (
@@ -126,7 +130,7 @@ export function AdminTopbar() {
                   : "text-muted-foreground/50",
               )}
             >
-              {st(seg) ?? seg}
+              {st.has(toCamelCase(seg)) ? st(toCamelCase(seg)) : seg}
             </span>
           </span>
         ))}

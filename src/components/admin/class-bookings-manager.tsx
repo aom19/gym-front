@@ -45,14 +45,14 @@ export function ClassBookingsManager({ classId }: Props) {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const [cls, bks, mems] = await Promise.all([
+            const [cls, bks, memsResult] = await Promise.all([
                 getGroupClassById(classId),
                 getClassBookings(classId),
-                getMembers(),
+                getMembers({ limit: 0 }),
             ]);
             setGroupClass(cls);
             setBookings(bks);
-            setMembers(mems);
+            setMembers(memsResult.data);
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Error loading data");
         } finally {

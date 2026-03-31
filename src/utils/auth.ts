@@ -104,5 +104,11 @@ export async function logout(): Promise<void> {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
+
+        // Clear zustand store
+        try {
+            const { useStore } = await import("@/store/useStore");
+            useStore.getState().clearAuth();
+        } catch { /* SSR safety */ }
     }
 }

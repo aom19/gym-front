@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import toast from "react-hot-toast";
 import { LogIn, LogOut, CheckSquare, Download, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useServerTable, type PaginationParams } from "@/hooks/useServerTable";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import {
     getCheckins,
     type Checkin,
@@ -16,55 +18,40 @@ import { getLocations, type UserLocation } from "@/services/users";
 export function CheckinsHistoryTable() {
     const t = useTranslations("checkinsHistory");
 
-    const [checkins, setCheckins] = useState<Checkin[]>([]);
     const [locations, setLocations] = useState<UserLocation[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [filterLocation, setFilterLocation] = useState("");
     const [filterDateFrom, setFilterDateFrom] = useState("");
     const [filterDateTo, setFilterDateTo] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
 
-    const loadCheckins = useCallback(async () => {
-        try {
-            setLoading(true);
-            const data = await getCheckins();
-            setCheckins(data);
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Error loading check-ins");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const fetchCheckins = useCallback(
+        (params: PaginationParams) =>
+            getCheckins({
+                ...params,
+                locationId: filterLocation || undefined,
+                dateFrom: filterDateFrom || undefined,
+                dateTo: filterDateTo || undefined,
+            }),
+        [filterLocation, filterDateFrom, filterDateTo]
+    );
+
+    const table = useServerTable<Checkin>({
+        fetchFn: fetchCheckins,
+        pageSize: 10,
+        defaultSort: "checkInAt",
+    });
 
     useEffect(() => {
-        loadCheckins();
-        getLocations().then(setLocations);
-    }, [loadCheckins]);
+        table.setPage(1);
+    }, [filterLocation, filterDateFrom, filterDateTo]);
 
-    // Client-side filtering
-    const filtered = checkins.filter((c) => {
-        if (filterLocation && c.locationId !== filterLocation) return false;
-        if (filterDateFrom) {
-            const from = new Date(filterDateFrom);
-            if (new Date(c.checkInAt) < from) return false;
-        }
-        if (filterDateTo) {
-            const to = new Date(filterDateTo);
-            to.setHours(23, 59, 59, 999);
-            if (new Date(c.checkInAt) > to) return false;
-        }
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const name = `${c.member.firstName} ${c.member.lastName}`.toLowerCase();
-            if (!name.includes(q) && !(c.member.email ?? "").toLowerCase().includes(q)) return false;
-        }
-        return true;
-    });
+    useEffect(() => {
+        getLocations().then(setLocations);
+    }, []);
 
     const handleExportCSV = () => {
         const headers = [t("member"), t("email"), t("location"), t("checkInTime"), t("checkOutTime")];
-        const rows = filtered.map((c) => [
+        const rows = table.items.map((c) => [
             `${c.member.firstName} ${c.member.lastName}`,
             c.member.email ?? "",
             c.location.name,
@@ -90,7 +77,7 @@ export function CheckinsHistoryTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button variant="outline" onClick={handleExportCSV} className="gap-1.5" disabled={filtered.length === 0}>
+                <Button variant="outline" onClick={handleExportCSV} className="gap-1.5" disabled={table.items.length === 0}>
                     <Download className="size-4" />
                     {t("exportCSV")}
                 </Button>
@@ -99,12 +86,12 @@ export function CheckinsHistoryTable() {
             {/* Filters */}
             <div className="flex flex-wrap gap-3">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                     <Input
-                        placeholder={t("searchPlaceholder")}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 w-64"
+                        placeholder={t("search")}
+                        value={table.search}
+                        onChange={(e) => table.setSearch(e.target.value)}
+                        className="pl-8 w-48 h-9 text-sm"
                     />
                 </div>
                 <select
@@ -131,7 +118,7 @@ export function CheckinsHistoryTable() {
                     className="w-40"
                     placeholder={t("dateTo")}
                 />
-                {(filterLocation || filterDateFrom || filterDateTo || searchQuery) && (
+                {(filterLocation || filterDateFrom || filterDateTo || table.search) && (
                     <Button
                         variant="ghost"
                         size="sm"
@@ -139,7 +126,7 @@ export function CheckinsHistoryTable() {
                             setFilterLocation("");
                             setFilterDateFrom("");
                             setFilterDateTo("");
-                            setSearchQuery("");
+                            table.setSearch("");
                         }}
                     >
                         {t("clearFilters")}
@@ -150,7 +137,7 @@ export function CheckinsHistoryTable() {
             {/* Stats */}
             <div className="flex gap-4">
                 <Badge variant="secondary" className="text-xs">
-                    {filtered.length} {t("results")}
+                    {table.totalItems} {t("results")}
                 </Badge>
             </div>
 
@@ -159,16 +146,16 @@ export function CheckinsHistoryTable() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("member")}</th>
+                            <SortableHeader label={t("member")} sortKey="memberName" currentSort={table.sort} onToggle={table.toggleSort} />
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("date")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("checkInTime")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden sm:table-cell">{t("checkOutTime")}</th>
-                            <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden md:table-cell">{t("location")}</th>
+                            <SortableHeader label={t("checkInTime")} sortKey="checkInAt" currentSort={table.sort} onToggle={table.toggleSort} />
+                            <SortableHeader label={t("checkOutTime")} sortKey="checkOutAt" currentSort={table.sort} onToggle={table.toggleSort} className="hidden sm:table-cell" />
+                            <SortableHeader label={t("location")} sortKey="locationName" currentSort={table.sort} onToggle={table.toggleSort} className="hidden md:table-cell" />
                             <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wide text-muted-foreground hidden lg:table-cell">{t("duration")}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {table.loading ? (
                             Array.from({ length: 8 }).map((_, i) => (
                                 <tr key={i} className="border-b border-border last:border-0">
                                     <td className="px-4 py-3"><div className="h-4 w-28 rounded-md skeleton-shimmer" /></td>
@@ -179,7 +166,7 @@ export function CheckinsHistoryTable() {
                                     <td className="px-4 py-3 hidden lg:table-cell"><div className="h-4 w-14 rounded-md skeleton-shimmer" /></td>
                                 </tr>
                             ))
-                        ) : filtered.length === 0 ? (
+                        ) : table.items.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-4 py-16 text-center">
                                     <CheckSquare className="mx-auto mb-3 size-8 text-muted-foreground/40" />
@@ -187,7 +174,7 @@ export function CheckinsHistoryTable() {
                                 </td>
                             </tr>
                         ) : (
-                            filtered.map((checkin) => {
+                            table.items.map((checkin) => {
                                 const checkIn = new Date(checkin.checkInAt);
                                 const checkOut = checkin.checkOutAt ? new Date(checkin.checkOutAt) : null;
                                 const durationMin = checkOut ? Math.round((checkOut.getTime() - checkIn.getTime()) / 60000) : null;
@@ -248,6 +235,16 @@ export function CheckinsHistoryTable() {
                     </tbody>
                 </table>
             </div>
+
+            {!table.loading && table.items.length > 0 && (
+                <TablePagination
+                    page={table.page}
+                    totalPages={table.totalPages}
+                    totalItems={table.totalItems}
+                    pageSize={table.pageSize}
+                    onPageChange={table.setPage}
+                />
+            )}
         </>
     );
 }

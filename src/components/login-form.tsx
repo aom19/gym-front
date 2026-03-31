@@ -8,6 +8,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useStore, syncAuthToBrowser } from "@/store/useStore";
+import type { StoreUser } from "@/store/useStore";
 
 interface LoginResponse {
   accessToken: string;
@@ -67,18 +69,16 @@ export function LoginForm() {
 
       const data = payload as LoginResponse;
 
-      // Set cookies so the middleware and SSR server components can read them.
-      document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${15 * 60}; SameSite=Lax`;
-      if (data.user) {
-        document.cookie = `user=${encodeURIComponent(JSON.stringify(data.user))}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-      }
+      // Persist auth state
+      const user: StoreUser | undefined = data.user ? {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        location: data.user.location,
+      } : undefined;
 
-      // localStorage fallback for client-side reads.
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
+      useStore.getState().login(data.accessToken, data.refreshToken, user ?? null as unknown as StoreUser);
+      syncAuthToBrowser(data.accessToken, data.refreshToken, user);
 
       toast.success("Login successful");
 

@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { AxiosError } from "axios";
+import type { PaginationParams, PaginatedResult } from "@/hooks/useServerTable";
 
 export type ClassType = "YOGA" | "ZUMBA" | "CROSSFIT" | "SPINNING" | "PILATES" | "BOXING" | "OTHER";
 
@@ -90,9 +91,9 @@ function handleError(error: unknown): never {
 
 // ── Group Classes ────────────────────────────────────────────────────────────
 
-export async function getGroupClasses(): Promise<GroupClass[]> {
+export async function getGroupClasses(params?: PaginationParams): Promise<PaginatedResult<GroupClass>> {
     try {
-        const { data } = await api.get<GroupClass[]>("/classes", { headers: getAuthHeaders() });
+        const { data } = await api.get<PaginatedResult<GroupClass>>("/classes", { headers: getAuthHeaders(), params });
         return data;
     } catch (error) {
         handleError(error);
