@@ -75,7 +75,8 @@
         "exercises": "Упражнения",
         "classes": "Занятия",
         "schedule": "Расписание",
-        "progress": "Прогресс"
+        "progress": "Прогресс",
+        "trainerDashboard": "Тренер"
     },
     "members": {
         "title": "Участники",
@@ -287,7 +288,8 @@
         "cyclingSchedule": "Пн / Ср / Сб — 09:00",
         "boxingSchedule": "Вт / Чт / Сб — 19:00",
         "pilatesSchedule": "Пт — 10:00",
-        "zumbaSchedule": "Ср / Пт — 17:30"
+        "zumbaSchedule": "Ср / Пт — 17:30",
+        "upcomingTitle": "Предстоящие занятия"
     },
     "locations": {
         "subtitle": "Найдите ближайший GymPro.",
@@ -541,6 +543,102 @@
         "deleting": "Удаление…",
         "errors": {
             "generic": "Произошла ошибка"
-        }
+        },
+        "weightTrend": "Динамика веса",
+        "bodyFatTrend": "Динамика жировой массы"
+    },
+    "checkinsHistory": {
+        "title": "История посещений",
+        "subtitle": "Полная история посещений",
+        "member": "Участник",
+        "email": "Email",
+        "location": "Локация",
+        "date": "Дата",
+        "checkInTime": "Вход",
+        "checkOutTime": "Выход",
+        "duration": "Длительность",
+        "noCheckins": "Посещений не найдено",
+        "allLocations": "Все локации",
+        "dateFrom": "С",
+        "dateTo": "По",
+        "searchPlaceholder": "Поиск по имени или email…",
+        "clearFilters": "Сбросить фильтры",
+        "results": "результатов",
+        "min": "мин",
+        "inProgress": "В процессе",
+        "exportCSV": "Экспорт CSV"
+    },
+    "memberSubscriptions": {
+        "title": "Абонементы",
+        "currentStatus": "Текущий статус",
+        "active": "Активен",
+        "daysLeft": "дней осталось",
+        "entriesLeft": "посещений осталось",
+        "expires": "Истекает",
+        "noActiveSubscription": "Нет активного абонемента",
+        "activateNew": "Активировать новый абонемент",
+        "activateSubscription": "Активация абонемента",
+        "selectPlan": "План абонемента",
+        "choosePlan": "Выберите план…",
+        "startDate": "Дата начала",
+        "startDateHint": "Оставьте пустым для сегодня",
+        "days": "дней",
+        "selectPlanRequired": "Выберите план",
+        "activateSuccess": "Абонемент активирован",
+        "cancelSuccess": "Абонемент отменён",
+        "activate": "Активировать",
+        "cancel": "Отмена",
+        "close": "Закрыть",
+        "history": "История абонементов",
+        "noSubscriptions": "Нет абонементов",
+        "saving": "Сохранение…"
+    },
+    "classBookings": {
+        "title": "Бронирования занятий",
+        "member": "Участник",
+        "email": "Email",
+        "bookedAt": "Забронировано",
+        "status": "Статус",
+        "actions": "Действия",
+        "confirmed": "Подтверждено",
+        "capacity": "Вместимость",
+        "spotsLeft": "Свободных мест",
+        "noBookings": "Нет бронирований",
+        "addBooking": "Добавить бронь",
+        "selectMember": "Выберите участника",
+        "selectMemberRequired": "Выберите участника",
+        "bookSuccess": "Бронирование подтверждено",
+        "cancelSuccess": "Бронирование отменено",
+        "cancelBooking": "Отменить",
+        "cancel": "Отмена",
+        "book": "Забронировать",
+        "saving": "Сохранение…"
+    },
+    "trainerDashboard": {
+        "title": "Панель тренера",
+        "subtitle": "Ваше расписание и активность",
+        "todayClasses": "Занятия сегодня",
+        "upcomingClasses": "Предстоящие занятия",
+        "recentWorkouts": "Последние тренировки",
+        "todaySchedule": "Расписание на сегодня",
+        "noClassesToday": "Нет занятий на сегодня",
+        "upcoming": "Предстоящие занятия",
+        "viewAll": "Все",
+        "viewBookings": "Бронирования",
+        "noUpcomingClasses": "Нет предстоящих занятий",
+        "latestWorkouts": "Последние тренировки",
+        "noWorkouts": "Нет тренировок",
+        "exercises": "упражнений"
+    },
+    "publicClasses": {
+        "upcomingTitle": "Предстоящие занятия",
+        "noClasses": "Нет доступных занятий",
+        "participants": "участников",
+        "reserve": "Забронировать",
+        "booking": "Бронирование…",
+        "booked": "Забронировано",
+        "full": "Мест нет",
+        "loginRequired": "Войдите для бронирования",
+        "bookSuccess": "Занятие забронировано!"
     }
 }

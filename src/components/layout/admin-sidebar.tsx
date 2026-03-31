@@ -23,6 +23,7 @@ import {
   Calendar,
   Clock,
   TrendingUp,
+  Activity,
 } from "lucide-react";
 
 interface NavItem {
@@ -41,6 +42,7 @@ const navGroups: NavGroup[] = [
     label: "main",
     items: [
       { key: "dashboard", icon: LayoutDashboard, href: "dashboard" },
+      { key: "trainerDashboard", icon: Activity, href: "trainer-dashboard" },
       { key: "members", icon: Users, href: "members" },
       { key: "checkins", icon: CheckSquare, href: "checkins" },
     ],

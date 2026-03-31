@@ -23,6 +23,12 @@
 - Pagină publică clase (`/classes`) — calendar clase disponibile
 - Program locație (`LocationScheduleManager`, serviciu `location-schedule.ts`)
 - Progres fitness admin (pagină `/admin/progress`, `FitnessProgressTable`, serviciu `fitness-progress.ts`)
+- Istoric check-in-uri (`/admin/checkins/history`) cu filtrare dată/locație/căutare + export CSV
+- Gestiune abonamente membri (componentă `MemberSubscriptions` în tabelul membri)
+- Pagina rezervări clasă (`/admin/classes/:id/bookings`, `ClassBookingsManager`)
+- Dashboard Trainer (`/admin/trainer-dashboard`)
+- Grafice progres fitness (recharts — greutate + grăsime corporală)
+- Buton „Rezervă" clase publice (`UpcomingClassesList` pe pagina `/classes`)
 
 ---
 
@@ -33,7 +39,7 @@
 - [x] Componentă `CheckInTable` — coloane: membru, locație, oră intrare, oră ieșire, cine a făcut check-in
 - [x] Modal check-in manual — căutare membru după nume/email + buton check-in
 - [x] Buton check-out per înregistrare
-- [ ] Pagină `/admin/checkins/history` — istoric complet cu filtrare dată + locație + export
+- [x] Pagină `/admin/checkins/history` — istoric complet cu filtrare dată + locație + export
 
 ### QR Check-in
 - [ ] Pagina `/checkin` (publică, pentru tabletă la recepție) — scanner QR cu cameră
@@ -48,8 +54,8 @@
 - [x] Serviciu `src/services/subscription-plans.ts`
 
 ### Abonamente membre
-- [ ] Secțiune abonament în pagina de detaliu a unui membru
-- [ ] Modal activare abonament nou — selectare plan + dată start + legare plată
+- [x] Secțiune abonament în pagina de detaliu a unui membru
+- [x] Modal activare abonament nou — selectare plan + dată start + legare plată
 - [x] Afișare status abonament cu badge colorat: ACTIV (verde), EXPIRAT (roșu), ANULAT (gri)
 - [x] Indicator zile rămase / intrări rămase
 - [x] Serviciu `src/services/subscriptions.ts`
@@ -69,28 +75,28 @@
 - [x] Pagină `/admin/exercises` — CRUD exerciții (ADMIN, TRAINER)
 - [x] Componentă `ExercisesTable` + Sheet formular cu grup muscular
 - [x] Pagină `/admin/workouts` — listă antrenamente
-- [ ] Componentă `WorkoutBuilder` — adăugare exerciții + seturi/reps/greutate
-- [ ] Pagina profil membru — secțiune "Istoric antrenamente"
+- [x] Componentă `WorkoutBuilder` — adăugare exerciții + seturi/reps/greutate (integrat în WorkoutsTable)
+- [ ] Pagina profil membru — secțiune "Istoric antrenamente" (serviciu workouts.getByMember disponibil)
 - [x] Servicii `src/services/exercises.ts`, `src/services/workouts.ts`
 
 ### Clase de grup
 - [x] Pagină `/admin/classes` — CRUD clase (ADMIN, TRAINER)
 - [x] Componentă `GroupClassesTable` cu status, instructor, dată, participanți
-- [ ] Modal creare/editare clasă: tip, instructor, locație, capacitate, dată/oră
-- [ ] Pagina `/admin/classes/:id/bookings` — lista participanților înscriși
+- [x] Modal creare/editare clasă: tip, instructor, locație, capacitate, dată/oră (integrat în GroupClassesTable)
+- [x] Pagina `/admin/classes/:id/bookings` — lista participanților înscriși
 - [ ] Calendar săptămânal al claselor (vizualizare grilă)
 - [x] Serviciu `src/services/classes.ts` (`group-classes.ts`)
 
 ### Rezervări clase (Member-facing)
 - [x] Pagina publică `/classes` — calendar clase disponibile
-- [ ] Buton "Rezervă" per clasă cu validare abonament
+- [x] Buton "Rezervă" per clasă cu validare abonament
 - [ ] Pagina `/member/my-classes` — rezervările mele active + istorice
 - [ ] Buton anulare rezervare
-- [ ] Serviciu `src/services/bookings.ts`
+- [x] Serviciu `src/services/bookings.ts` (integrat în group-classes.ts)
 
 ### Dashboard Trainer
-- [ ] Pagina `/admin/trainer-dashboard` (vizibilă pentru TRAINER)
-- [ ] Secțiuni: membri asignați, clasele de azi, antrenamente planificate
+- [x] Pagina `/admin/trainer-dashboard` (vizibilă pentru TRAINER)
+- [x] Secțiuni: clasele de azi, clase viitoare, antrenamente recente
 - [ ] Calendar personal trainer
 
 ### Program locație
@@ -101,7 +107,7 @@
 ### Progres fitness (Member)
 - [x] Pagină `/admin/progress` — tabel înregistrări cu formular adăugare
 - [ ] Pagina `/member/progress` — vizualizare personală progres
-- [ ] Grafice evoluție: greutate în timp, progres măsurători (chart.js sau recharts)
+- [x] Grafice evoluție: greutate în timp, grăsime corporală (recharts)
 - [x] Serviciu `src/services/progress.ts` (`fitness-progress.ts`)
 
 ---

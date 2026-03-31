@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { Users, Clock } from "lucide-react";
+import { UpcomingClassesList } from "@/components/public/upcoming-classes-list";
 
 type ScheduleKey = "yogaSchedule" | "hiitSchedule" | "cyclingSchedule" | "boxingSchedule" | "pilatesSchedule" | "zumbaSchedule";
 
@@ -117,6 +118,12 @@ export default async function ClassesPage({
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Dynamic upcoming classes with booking */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">{t("upcomingTitle")}</h2>
+          <UpcomingClassesList />
         </div>
       </div>
     </section>

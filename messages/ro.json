@@ -75,7 +75,8 @@
         "exercises": "Exerciții",
         "classes": "Cursuri",
         "schedule": "Program",
-        "progress": "Progres"
+        "progress": "Progres",
+        "trainerDashboard": "Antrenor"
     },
     "members": {
         "title": "Membri",
@@ -287,7 +288,8 @@
         "cyclingSchedule": "Lun / Mie / Sâm — 09:00",
         "boxingSchedule": "Mar / Joi / Sâm — 19:00",
         "pilatesSchedule": "Vin — 10:00",
-        "zumbaSchedule": "Mie / Vin — 17:30"
+        "zumbaSchedule": "Mie / Vin — 17:30",
+        "upcomingTitle": "Clase viitoare"
     },
     "locations": {
         "subtitle": "Găsește cea mai apropiată locație GymPro.",
@@ -541,6 +543,102 @@
         "deleting": "Se șterge…",
         "errors": {
             "generic": "A apărut o eroare"
-        }
+        },
+        "weightTrend": "Evoluție greutate",
+        "bodyFatTrend": "Evoluție grăsime corporală"
+    },
+    "checkinsHistory": {
+        "title": "Istoric Check-in-uri",
+        "subtitle": "Istoric complet prezențe",
+        "member": "Membru",
+        "email": "Email",
+        "location": "Locație",
+        "date": "Data",
+        "checkInTime": "Check-in",
+        "checkOutTime": "Check-out",
+        "duration": "Durată",
+        "noCheckins": "Niciun check-in găsit",
+        "allLocations": "Toate locațiile",
+        "dateFrom": "De la",
+        "dateTo": "Până la",
+        "searchPlaceholder": "Caută după nume sau email…",
+        "clearFilters": "Șterge filtre",
+        "results": "rezultate",
+        "min": "min",
+        "inProgress": "În desfășurare",
+        "exportCSV": "Export CSV"
+    },
+    "memberSubscriptions": {
+        "title": "Abonamente",
+        "currentStatus": "Status curent",
+        "active": "Activ",
+        "daysLeft": "zile rămase",
+        "entriesLeft": "intrări rămase",
+        "expires": "Expiră",
+        "noActiveSubscription": "Niciun abonament activ",
+        "activateNew": "Activează abonament nou",
+        "activateSubscription": "Activare abonament",
+        "selectPlan": "Plan de abonament",
+        "choosePlan": "Alege un plan…",
+        "startDate": "Data start",
+        "startDateHint": "Lasă gol pentru astăzi",
+        "days": "zile",
+        "selectPlanRequired": "Selectează un plan",
+        "activateSuccess": "Abonament activat cu succes",
+        "cancelSuccess": "Abonament anulat",
+        "activate": "Activează",
+        "cancel": "Anulare",
+        "close": "Închide",
+        "history": "Istoric abonamente",
+        "noSubscriptions": "Niciun abonament",
+        "saving": "Se salvează…"
+    },
+    "classBookings": {
+        "title": "Rezervări clasă",
+        "member": "Membru",
+        "email": "Email",
+        "bookedAt": "Rezervat la",
+        "status": "Status",
+        "actions": "Acțiuni",
+        "confirmed": "Confirmate",
+        "capacity": "Capacitate",
+        "spotsLeft": "Locuri libere",
+        "noBookings": "Nicio rezervare",
+        "addBooking": "Adaugă rezervare",
+        "selectMember": "Selectează un membru",
+        "selectMemberRequired": "Selectează un membru",
+        "bookSuccess": "Rezervare confirmată",
+        "cancelSuccess": "Rezervare anulată",
+        "cancelBooking": "Anulare",
+        "cancel": "Anulare",
+        "book": "Rezervă",
+        "saving": "Se salvează…"
+    },
+    "trainerDashboard": {
+        "title": "Dashboard Antrenor",
+        "subtitle": "Programul și activitatea ta",
+        "todayClasses": "Clase azi",
+        "upcomingClasses": "Clase viitoare",
+        "recentWorkouts": "Antrenamente recente",
+        "todaySchedule": "Programul de azi",
+        "noClassesToday": "Nicio clasă programată azi",
+        "upcoming": "Clase viitoare",
+        "viewAll": "Vezi tot",
+        "viewBookings": "Rezervări",
+        "noUpcomingClasses": "Nicio clasă viitoare",
+        "latestWorkouts": "Ultimele antrenamente",
+        "noWorkouts": "Niciun antrenament",
+        "exercises": "exerciții"
+    },
+    "publicClasses": {
+        "upcomingTitle": "Clase viitoare",
+        "noClasses": "Nicio clasă disponibilă",
+        "participants": "participanți",
+        "reserve": "Rezervă loc",
+        "booking": "Se rezervă…",
+        "booked": "Rezervat",
+        "full": "Clasă plină",
+        "loginRequired": "Autentifică-te pentru a rezerva",
+        "bookSuccess": "Clasă rezervată cu succes!"
     }
 }

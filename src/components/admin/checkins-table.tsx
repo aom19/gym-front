@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { LogIn, LogOut, Plus, CheckSquare } from "lucide-react";
+import { LogIn, LogOut, Plus, CheckSquare, History } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -25,6 +27,7 @@ import { getLocations, type UserLocation } from "@/services/users";
 
 export function CheckinsTable() {
     const t = useTranslations("checkins");
+    const lang = useLocale();
 
     const [checkins, setCheckins] = useState<Checkin[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
@@ -111,17 +114,25 @@ export function CheckinsTable() {
                     <h1 className="text-xl font-semibold tracking-tight text-foreground">{t("title")}</h1>
                     <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setForm({ memberId: "", locationId: "" });
-                        setFormError(null);
-                        setCreateOpen(true);
-                    }}
-                    className="gap-1.5"
-                >
-                    <Plus className="size-4" />
-                    {t("checkIn")}
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={() => {
+                            setForm({ memberId: "", locationId: "" });
+                            setFormError(null);
+                            setCreateOpen(true);
+                        }}
+                        className="gap-1.5"
+                    >
+                        <Plus className="size-4" />
+                        {t("checkIn")}
+                    </Button>
+                    <Link href={`/${lang}/admin/checkins/history`}>
+                        <Button variant="outline" className="gap-1.5">
+                            <History className="size-4" />
+                            {t("allCheckins")}
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {/* Summary cards by location */}

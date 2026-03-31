@@ -75,7 +75,8 @@
         "exercises": "Exercises",
         "classes": "Classes",
         "schedule": "Schedule",
-        "progress": "Progress"
+        "progress": "Progress",
+        "trainerDashboard": "Trainer"
     },
     "members": {
         "title": "Members",
@@ -287,7 +288,8 @@
         "cyclingSchedule": "Mon / Wed / Sat — 09:00",
         "boxingSchedule": "Tue / Thu / Sat — 19:00",
         "pilatesSchedule": "Fri — 10:00",
-        "zumbaSchedule": "Wed / Fri — 17:30"
+        "zumbaSchedule": "Wed / Fri — 17:30",
+        "upcomingTitle": "Upcoming Classes"
     },
     "locations": {
         "subtitle": "Find your nearest GymPro location.",
@@ -541,6 +543,102 @@
         "deleting": "Deleting…",
         "errors": {
             "generic": "An error occurred"
-        }
+        },
+        "weightTrend": "Weight Trend",
+        "bodyFatTrend": "Body Fat Trend"
+    },
+    "checkinsHistory": {
+        "title": "Check-in History",
+        "subtitle": "Complete attendance history",
+        "member": "Member",
+        "email": "Email",
+        "location": "Location",
+        "date": "Date",
+        "checkInTime": "Check-in",
+        "checkOutTime": "Check-out",
+        "duration": "Duration",
+        "noCheckins": "No check-ins found",
+        "allLocations": "All Locations",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "searchPlaceholder": "Search by name or email…",
+        "clearFilters": "Clear filters",
+        "results": "results",
+        "min": "min",
+        "inProgress": "In progress",
+        "exportCSV": "Export CSV"
+    },
+    "memberSubscriptions": {
+        "title": "Subscriptions",
+        "currentStatus": "Current Status",
+        "active": "Active",
+        "daysLeft": "days left",
+        "entriesLeft": "entries left",
+        "expires": "Expires",
+        "noActiveSubscription": "No active subscription",
+        "activateNew": "Activate New Subscription",
+        "activateSubscription": "Activate Subscription",
+        "selectPlan": "Subscription Plan",
+        "choosePlan": "Choose a plan…",
+        "startDate": "Start Date",
+        "startDateHint": "Leave empty for today",
+        "days": "days",
+        "selectPlanRequired": "Please select a plan",
+        "activateSuccess": "Subscription activated successfully",
+        "cancelSuccess": "Subscription cancelled",
+        "activate": "Activate",
+        "cancel": "Cancel",
+        "close": "Close",
+        "history": "Subscription History",
+        "noSubscriptions": "No subscriptions yet",
+        "saving": "Saving…"
+    },
+    "classBookings": {
+        "title": "Class Bookings",
+        "member": "Member",
+        "email": "Email",
+        "bookedAt": "Booked At",
+        "status": "Status",
+        "actions": "Actions",
+        "confirmed": "Confirmed",
+        "capacity": "Capacity",
+        "spotsLeft": "Spots Left",
+        "noBookings": "No bookings yet",
+        "addBooking": "Add Booking",
+        "selectMember": "Select a member",
+        "selectMemberRequired": "Please select a member",
+        "bookSuccess": "Booking confirmed",
+        "cancelSuccess": "Booking cancelled",
+        "cancelBooking": "Cancel",
+        "cancel": "Cancel",
+        "book": "Book",
+        "saving": "Saving…"
+    },
+    "trainerDashboard": {
+        "title": "Trainer Dashboard",
+        "subtitle": "Your schedule and activity overview",
+        "todayClasses": "Today's Classes",
+        "upcomingClasses": "Upcoming Classes",
+        "recentWorkouts": "Recent Workouts",
+        "todaySchedule": "Today's Schedule",
+        "noClassesToday": "No classes scheduled for today",
+        "upcoming": "Upcoming Classes",
+        "viewAll": "View All",
+        "viewBookings": "Bookings",
+        "noUpcomingClasses": "No upcoming classes",
+        "latestWorkouts": "Latest Workouts",
+        "noWorkouts": "No workouts yet",
+        "exercises": "exercises"
+    },
+    "publicClasses": {
+        "upcomingTitle": "Upcoming Classes",
+        "noClasses": "No upcoming classes available",
+        "participants": "participants",
+        "reserve": "Reserve Spot",
+        "booking": "Booking…",
+        "booked": "Booked",
+        "full": "Class Full",
+        "loginRequired": "Please log in to book a class",
+        "bookSuccess": "Class booked successfully!"
     }
 }

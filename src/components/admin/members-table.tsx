@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
-import { Pencil, Trash2, Plus, Users } from "lucide-react";
+import { Pencil, Trash2, Plus, Users, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import {
     type CreateMemberPayload,
 } from "@/services/members";
 import { getLocations, type UserLocation } from "@/services/users";
+import { MemberSubscriptions } from "@/components/admin/member-subscriptions";
 
 interface FormState {
     firstName: string;
@@ -57,6 +58,7 @@ export function MembersTable({ userRole }: { userRole: string }) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editMember, setEditMember] = useState<Member | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Member | null>(null);
+    const [subsMember, setSubsMember] = useState<Member | null>(null);
 
     const [form, setForm] = useState<FormState>(emptyForm);
     const [submitting, setSubmitting] = useState(false);
@@ -269,6 +271,14 @@ export function MembersTable({ userRole }: { userRole: string }) {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon-sm"
+                                                    onClick={() => setSubsMember(member)}
+                                                    aria-label="Manage subscriptions"
+                                                >
+                                                    <CreditCard className="size-3.5" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon-sm"
                                                     onClick={() => openEdit(member)}
                                                     aria-label="Edit member"
                                                 >
@@ -403,6 +413,16 @@ export function MembersTable({ userRole }: { userRole: string }) {
                     </div>
                 </div>
             ) : null}
+
+            {/* ── Member Subscriptions Sheet ──────────────────────────────── */}
+            {subsMember && (
+                <MemberSubscriptions
+                    memberId={subsMember.id}
+                    memberName={`${subsMember.firstName} ${subsMember.lastName}`}
+                    open={!!subsMember}
+                    onClose={() => { setSubsMember(null); loadMembers(); }}
+                />
+            )}
         </>
     );
 }

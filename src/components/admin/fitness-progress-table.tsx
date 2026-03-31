@@ -20,6 +20,7 @@ import {
     type FitnessProgress,
 } from "@/services/fitness-progress";
 import { getMembers, type Member } from "@/services/members";
+import { FitnessProgressCharts } from "@/components/admin/fitness-progress-charts";
 
 interface FormState {
     memberId: string;
@@ -148,6 +149,11 @@ export function FitnessProgressTable({ userRole }: { userRole: string }) {
                     </Button>
                 </div>
             </div>
+
+            {/* Charts */}
+            {!loading && progress.length >= 2 && (
+                <FitnessProgressCharts data={progress} />
+            )}
 
             <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <table className="w-full text-sm">
