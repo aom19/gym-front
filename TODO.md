@@ -29,6 +29,13 @@
 - Dashboard Trainer (`/admin/trainer-dashboard`)
 - Grafice progres fitness (recharts — greutate + grăsime corporală)
 - Buton „Rezervă" clase publice (`UpcomingClassesList` pe pagina `/classes`)
+- Pagină rapoarte admin (`/admin/reports`) — KPI-uri, grafice, statistici
+- Token refresh automat (interceptor axios cu deduplicare)
+- Stare globală user în zustand (sync cu cookie)
+- Paginare server-side pe TOATE tabelele (useServerTable hook, SortableHeader, TablePagination)
+- Căutare server-side pe TOATE tabelele (debounced, API search)
+- Sortare coloane server-side pe TOATE tabelele
+- Error boundary per pagină admin (`error.tsx`)
 
 ---
 
@@ -112,72 +119,143 @@
 
 ---
 
-## 🟢 Prioritate scăzută / Opțional
+## 🔧 Îmbunătățiri tehnice
 
-### Dashboard Membru
-- [ ] Pagina `/member/dashboard` — rezumat:
-  - abonament activ + zile rămase
-  - check-in-uri luna aceasta
-  - următorul antrenament
-  - progres challenge activ
-  - ultimele notificări
+- [x] Paginare server-side pentru toate tabelele mari (membri, plăți, check-in-uri etc.)
+- [x] Filtrare + căutare server-side în tabele (debounced search)
+- [x] Sortare coloane server-side în tabele (SortableHeader + useServerTable)
+- [ ] Lazy loading pagini (route-based code splitting)
+- [x] Gestionare token refresh automat în `src/services/api.ts` (interceptor axios)
+- [x] Stare globală user în zustand (sync cu cookie)
+- [ ] Pagini de eroare personalizate (404, 500) — design consistent cu aplicația
+- [ ] Loading skeleton global pentru navigare între pagini
+- [ ] Teste unitare componente critice (useServerTable, auth flow)
+- [ ] Teste E2E cu Playwright (login → CRUD → logout)
 
-### Challenge System
-- [ ] Pagina `/admin/challenges` — CRUD challenge-uri
+---
+
+## 🎨 Design & UX — Îmbunătățiri
+
+### Responsive & Mobile
+- [ ] Layout admin responsive complet — sidebar colapsabil pe mobile (hamburger menu)
+- [ ] Tabele responsive — card view pe mobile (stacked layout sub 768px)
+- [ ] Touch-friendly: butoane mai mari, spacing generos pe mobile
+- [ ] Bottom navigation bar pe mobile pentru admin (Dashboard, Members, Check-in, More)
+
+### Teme & Branding
+- [ ] Customizare temă per sală (logo, culori primare/secundare) — settings admin
+- [ ] Pagina publică landing (`/`) cu informații sală, program, locații, prețuri
+- [ ] Pagina publică prețuri (`/pricing`) — planuri abonament cu design card
+- [ ] Upload logo sală + afișare în sidebar și pagini publice
+
+### Animații & Micro-interacțiuni
+- [ ] Tranziții pagini (fade/slide între rute admin)
+- [ ] Animații tabele: fade-in pe rânduri noi, slide-out pe ștergere
+- [ ] Toast notificări cu animație (deja parțial cu react-hot-toast)
+- [ ] Skeleton shimmer îmbunătățit pe toate tabelele (deja parțial)
+- [ ] Confirmare ștergere cu animație (AlertDialog cu tranziție)
+
+### Dashboard Îmbunătățit
+- [ ] Grafic check-in-uri pe zi (bar chart ultimele 30 zile)
+- [ ] Grafic venituri pe lună (line chart ultimele 12 luni)
+- [ ] Grafic distribuție abonamente active per plan (pie/donut chart)
+- [ ] Widget „membri noi luna aceasta" cu trend vs luna trecută
+- [ ] Card „locații overview" — check-in-uri acum per locație (live)
+
+### UX Tabele
+- [ ] Selecție multiplă rânduri (checkbox) + acțiuni în bulk (ștergere, export)
+- [ ] Column visibility toggle (ascunde/afișează coloane)
+- [ ] Filtre avansate per coloană (dropdown status, range dată, range sumă)
+- [ ] Sticky header tabel la scroll
+- [ ] Row detail expansion (click pe rând → detalii complete)
+- [ ] Keyboard navigation în tabele (↑↓ pentru navigare, Enter pentru acțiune)
+
+---
+
+## 🚀 Feature-uri noi recomandate (Gym Management Complet)
+
+### Portal Membru (Member App)
+- [ ] Pagina `/member/dashboard` — rezumat personal:
+  - Abonament activ + zile/intrări rămase cu progress bar
+  - Check-in-uri luna aceasta (calendar heatmap)
+  - Următorul antrenament programat
+  - Clase rezervate viitoare
+  - Notificări recente
+- [ ] Pagina `/member/profile` — editare date personale, foto, parolă
+- [ ] Pagina `/member/my-classes` — rezervările mele (active + istoric) cu anulare
+- [ ] Pagina `/member/progress` — vizualizare personală progres cu grafice
+- [ ] Pagina `/member/workouts` — istoric antrenamente personale
+- [ ] Pagina `/member/card` — QR card digital (foto, nume, status abonament, QR code)
+
+### QR Check-in System
+- [ ] Pagina `/checkin` (publică, tabletă recepție) — scanner QR cameră
+- [ ] Integrare `@zxing/browser` sau `html5-qrcode`
+- [ ] Ecran rezultat: Membru acceptat (verde, animație ✓) / Expirat (roșu) / Necunoscut (gri)
+- [ ] Pagina `/member/qr-card` — generare QR cu `qrcode.react`
+- [ ] Mode kiosk (fullscreen, timp limitat afișare rezultat)
+
+### Challenge System / Gamification
+- [ ] Pagina `/admin/challenges` — CRUD challenge-uri (obiective check-in, antrenamente, greutate)
 - [ ] Componentă `ChallengeCard` cu bară progres și clasament
 - [ ] Pagina `/member/challenges` — challenge-uri disponibile + buton join
-- [ ] Leaderboard per challenge
+- [ ] Leaderboard per challenge cu avatar + scor
+- [ ] Badge-uri / achievement-uri (100 check-in-uri, 1 an membru, etc.)
 - [ ] Serviciu `src/services/challenges.ts`
 
 ### Notificări
 - [ ] Componentă `NotificationBell` în header cu badge număr necitite
-- [ ] Dropdown notificări: listă cu tip, mesaj, timestamp
-- [ ] Marcare toate citite
+- [ ] Dropdown notificări: tip, mesaj, timestamp, link acțiune
+- [ ] Notificări: expirare abonament (3 zile înainte), confirmare rezervare, mesaj nou
+- [ ] Push notifications (optional, Service Worker)
 - [ ] Serviciu `src/services/notifications.ts`
 
-### Export Rapoarte
-- [ ] Butoane "Export CSV" în tabelele de membri, plăți, check-in-uri
-- [ ] Pagina `/admin/reports` — rapoarte predefinite cu filtrare perioadă + locație
-- [ ] Grafice: venit lunar, check-in-uri pe zi, abonamente active vs expirate
+### Rapoarte Avansate
+- [ ] Pagina `/admin/reports` îmbunătățită — filtrare perioadă + locație + comparație
+- [ ] Raport: Venituri (pe lună, pe plan, pe metodă plată)
+- [ ] Raport: Retenție membri (rata de reînnoire abonament)
+- [ ] Raport: Ore de vârf (check-in-uri pe oră din zi — heatmap)
+- [ ] Raport: Ocupare clase (rata rezervare vs capacitate)
+- [ ] Export PDF rapoarte cu branding sală
+- [ ] Export CSV pe TOATE tabelele (nu doar check-in-uri)
 
 ### Discounturi & Promoții
 - [ ] Pagina `/admin/promo` — CRUD coduri promoționale
+- [ ] Model: cod, discount %, discount fix, valabil până la, limită utilizări
 - [ ] Input cod promo în formularul de plată cu validare live
+- [ ] Promoții automate: „first month free", „referral discount"
 - [ ] Serviciu `src/services/promo.ts`
 
 ### Echipamente
 - [ ] Pagina `/admin/equipment` — CRUD echipamente per locație
-- [ ] Badge status cu culori: FUNCTIONAL (verde), MAINTENANCE (galben), BROKEN (roșu)
+- [ ] Badge status: FUNCTIONAL (verde), MAINTENANCE (galben), BROKEN (roșu)
+- [ ] Programare mentenanță (dată următoare verificare)
+- [ ] Istoric mentenanță per echipament
 - [ ] Serviciu `src/services/equipment.ts`
 
-### Mesagerie Trainer–Membru
-- [ ] Pagina `/admin/messages` — inbox simplu
-- [ ] Componentă `ChatPanel` — conversație cu un utilizator
-- [ ] Notificare mesaj nou (badge)
+### Mesagerie
+- [ ] Pagina `/admin/messages` — inbox cu conversații
+- [ ] Chat panel Trainer ↔ Membru
+- [ ] Notificare mesaj nou (badge + push)
+- [ ] Atașamente (imagini, PDF-uri plan antrenament)
 - [ ] Serviciu `src/services/messages.ts`
 
-### Contracte membre
+### Contracte & Documente
 - [ ] Secțiune "Contract" în profilul membrului
-- [ ] Upload link document + status semnat/nesemnat
+- [ ] Upload document (PDF) + status semnat/nesemnat
+- [ ] Semnătură digitală (canvas draw)
+- [ ] Template contracte editabile per sală
 - [ ] Serviciu `src/services/contracts.ts`
 
-### QR Membership Card
-- [ ] Pagina `/member/card` — afișare card digital với:
-  - Foto/avatar
-  - Nume complet
-  - Status abonament
-  - QR code (JWT scurt sau UUID membership)
-- [ ] Generare QR cu `qrcode` sau `qrcode.react`
+### Programări Antrenamente
+- [ ] Calendar programări antrenament 1-on-1 (Trainer + Membru)
+- [ ] Slots disponibile per trainer (orar configurabil)
+- [ ] Confirmare / anulare programare de ambele părți
+- [ ] Reminder automat (notificare cu o oră înainte)
 
----
-
-## 🔧 Îmbunătățiri tehnice
-
-- [ ] Paginare pentru toate tabelele mari (membri, plăți, check-in-uri)
-- [ ] Filtrare + căutare în tabele
-- [ ] Sortare coloane tabele
-- [ ] Lazy loading pagini (route-based code splitting)
-- [ ] Gestionare token refresh automat în `src/services/api.ts` (interceptor axios)
-- [ ] Stare globală user în zustand (sync cu cookie)
-- [ ] Pagini de eroare personalizate (404, 500)
+### Automatizări
+- [ ] Email automat la expirare abonament (3 zile, 1 zi, expirat)
+- [ ] Email bun venit membru nou cu instrucțiuni prima vizită
+- [ ] Email confirmare reservare clasă
+- [ ] Raport zilnic/săptămânal automat pe email (ADMIN)
+- [ ] Cron job cleanup: check-out automat la miezul nopții pentru check-in-uri fără check-out
 
