@@ -339,3 +339,98 @@
   0%, 100% { box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 35%); }
   50% { box-shadow: 0 0 0 3px oklch(from var(--primary) l c h / 0%); }
 }
+
+/* ── Schedule-X calendar overrides ── */
+.gym-calendar-wrapper .sx-react-calendar-wrapper {
+  height: 900px;
+  max-height: 88vh;
+  --sx-week-grid-hour-height: 80px;
+}
+
+/* Round the header corners */
+.gym-calendar-wrapper .sx__calendar-header {
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+/* Current time indicator */
+.gym-calendar-wrapper .sx__current-time-indicator {
+  z-index: 10;
+}
+
+.gym-calendar-wrapper .sx__current-time-line {
+  border-top: 2px solid hsl(var(--primary));
+}
+
+.gym-calendar-wrapper .sx__current-time-line::before {
+  background-color: hsl(var(--primary));
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: -5px;
+}
+
+/* Event card base */
+.gym-calendar-wrapper .sx__time-grid-event {
+  border-radius: 10px !important;
+  border-left-width: 4px !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+.gym-calendar-wrapper .sx__time-grid-event:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.15);
+  z-index: 20 !important;
+}
+
+.dark .gym-calendar-wrapper .sx__time-grid-event:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.4);
+}
+
+/* Class events — blue accent + subtle stripe pattern */
+.gym-calendar-wrapper .sx__time-grid-event[data-event-type="class"] {
+  border-left-color: #3b82f6 !important;
+}
+
+.dark .gym-calendar-wrapper .sx__time-grid-event[data-event-type="class"] {
+  border-left-color: #60a5fa !important;
+}
+
+/* Workout events — green accent + subtle diagonal pattern */
+.gym-calendar-wrapper .sx__time-grid-event[data-event-type="workout"] {
+  border-left-color: #22c55e !important;
+}
+
+.dark .gym-calendar-wrapper .sx__time-grid-event[data-event-type="workout"] {
+  border-left-color: #4ade80 !important;
+}
+
+/* Softer grid lines */
+.gym-calendar-wrapper .sx__week-grid__date-axis,
+.gym-calendar-wrapper .sx__week-grid__time-axis {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Today column highlight */
+.gym-calendar-wrapper .sx__week-grid__day.is-today {
+  background-color: hsl(var(--primary) / 0.04);
+}
+
+.dark .gym-calendar-wrapper .sx__week-grid__day.is-today {
+  background-color: hsl(var(--primary) / 0.08);
+}
+
+/* Event modal improvements */
+.gym-calendar-wrapper .sx__event-modal {
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.12);
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .gym-calendar-wrapper .sx__event-modal {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.4);
+}

@@ -61,6 +61,26 @@ export function middleware(request: NextRequest) {
         }
     }
 
+    // Protect /{lang}/member/* routes
+    if (/^\/(?:ro|en|ru)\/member/.test(pathname)) {
+        const token = request.cookies.get("accessToken")?.value;
+        const locale = pathname.split("/")[1] ?? "ro";
+
+        if (!token) {
+            return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+        }
+
+        const payload = decodeJwtPayload(token);
+
+        if (
+            !payload ||
+            !payload.role ||
+            (payload.exp && payload.exp * 1000 < Date.now())
+        ) {
+            return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
+        }
+    }
+
     // Let next-intl handle locale detection / prefixing for everything else
     return intlMiddleware(request);
 }

@@ -70,6 +70,15 @@ export async function getMembers(params?: PaginationParams): Promise<PaginatedRe
     }
 }
 
+export async function getMyMemberProfile(): Promise<Member> {
+    try {
+        const { data } = await api.get<Member>("/members/me", { headers: getAuthHeaders() });
+        return data;
+    } catch (error) {
+        handleError(error);
+    }
+}
+
 export async function getMemberById(id: string): Promise<Member> {
     try {
         const { data } = await api.get<Member>(`/members/${id}`, { headers: getAuthHeaders() });

@@ -83,7 +83,7 @@
 - [x] Componentă `ExercisesTable` + Sheet formular cu grup muscular
 - [x] Pagină `/admin/workouts` — listă antrenamente
 - [x] Componentă `WorkoutBuilder` — adăugare exerciții + seturi/reps/greutate (integrat în WorkoutsTable)
-- [ ] Pagina profil membru — secțiune "Istoric antrenamente" (serviciu workouts.getByMember disponibil)
+- [x] Pagina profil membru — secțiune "Istoric antrenamente" (`/member/workouts`)
 - [x] Servicii `src/services/exercises.ts`, `src/services/workouts.ts`
 
 ### Clase de grup
@@ -91,20 +91,20 @@
 - [x] Componentă `GroupClassesTable` cu status, instructor, dată, participanți
 - [x] Modal creare/editare clasă: tip, instructor, locație, capacitate, dată/oră (integrat în GroupClassesTable)
 - [x] Pagina `/admin/classes/:id/bookings` — lista participanților înscriși
-- [ ] Calendar săptămânal al claselor (vizualizare grilă)
+- [x] Calendar săptămânal al claselor (vizualizare grilă — Schedule-X, `/member/calendar`)
 - [x] Serviciu `src/services/classes.ts` (`group-classes.ts`)
 
 ### Rezervări clase (Member-facing)
 - [x] Pagina publică `/classes` — calendar clase disponibile
 - [x] Buton "Rezervă" per clasă cu validare abonament
-- [ ] Pagina `/member/my-classes` — rezervările mele active + istorice
-- [ ] Buton anulare rezervare
+- [x] Pagina `/member/my-classes` — rezervările mele active + istorice
+- [x] Buton anulare rezervare
 - [x] Serviciu `src/services/bookings.ts` (integrat în group-classes.ts)
 
 ### Dashboard Trainer
 - [x] Pagina `/admin/trainer-dashboard` (vizibilă pentru TRAINER)
 - [x] Secțiuni: clasele de azi, clase viitoare, antrenamente recente
-- [ ] Calendar personal trainer
+- [x] Calendar personal trainer (Schedule-X, `/admin/trainer-calendar`)
 
 ### Program locație
 - [x] Tab "Program" în pagina de detaliu a locației
@@ -113,14 +113,15 @@
 
 ### Progres fitness (Member)
 - [x] Pagină `/admin/progress` — tabel înregistrări cu formular adăugare
-- [ ] Pagina `/member/progress` — vizualizare personală progres
+- [x] Pagina `/member/progress` — vizualizare personală progres
 - [x] Grafice evoluție: greutate în timp, grăsime corporală (recharts)
 - [x] Serviciu `src/services/progress.ts` (`fitness-progress.ts`)
 
 ---
 
-## 🔧 Îmbunătățiri tehnice
+## � Prioritate scăzută / Opțional
 
+### Îmbunătățiri tehnice
 - [x] Paginare server-side pentru toate tabelele mari (membri, plăți, check-in-uri etc.)
 - [x] Filtrare + căutare server-side în tabele (debounced search)
 - [x] Sortare coloane server-side în tabele (SortableHeader + useServerTable)
@@ -131,10 +132,6 @@
 - [ ] Loading skeleton global pentru navigare între pagini
 - [ ] Teste unitare componente critice (useServerTable, auth flow)
 - [ ] Teste E2E cu Playwright (login → CRUD → logout)
-
----
-
-## 🎨 Design & UX — Îmbunătățiri
 
 ### Responsive & Mobile
 - [ ] Layout admin responsive complet — sidebar colapsabil pe mobile (hamburger menu)
@@ -182,9 +179,9 @@
   - Clase rezervate viitoare
   - Notificări recente
 - [ ] Pagina `/member/profile` — editare date personale, foto, parolă
-- [ ] Pagina `/member/my-classes` — rezervările mele (active + istoric) cu anulare
-- [ ] Pagina `/member/progress` — vizualizare personală progres cu grafice
-- [ ] Pagina `/member/workouts` — istoric antrenamente personale
+- [x] Pagina `/member/my-classes` — rezervările mele (active + istoric) cu anulare
+- [x] Pagina `/member/progress` — vizualizare personală progres cu grafice
+- [x] Pagina `/member/workouts` — istoric antrenamente personale
 - [ ] Pagina `/member/card` — QR card digital (foto, nume, status abonament, QR code)
 
 ### QR Check-in System

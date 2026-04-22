@@ -181,3 +181,12 @@ export async function cancelBooking(classId: string, memberId: string): Promise<
         handleError(error);
     }
 }
+
+export async function getMemberBookings(memberId: string): Promise<ClassBooking[]> {
+    try {
+        const { data } = await api.get<ClassBooking[]>(`/classes/member/${memberId}/bookings`, { headers: getAuthHeaders() });
+        return data;
+    } catch (error) {
+        handleError(error);
+    }
+}
